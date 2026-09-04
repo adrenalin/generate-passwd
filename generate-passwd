@@ -1,0 +1,155 @@
+#!/usr/bin/env python3
+"""Generate random passwords, either as character strings or as word phrases."""
+
+import argparse
+import os
+import secrets
+import string
+import sys
+from pathlib import Path
+
+__version__ = "1.0.0"
+
+PROG = "generate-passwd"
+
+DEFAULT_LENGTH = 32
+DEFAULT_WORD_SEPARATOR = "-"
+DEFAULT_WORD_COUNT = 8
+DEFAULT_QUANTITY = 5
+
+# Where wordlist.txt is looked up, in order. The first two entries let the
+# script run straight out of a checkout or from any --prefix install
+# (/usr/local/bin/generate-passwd -> /usr/local/share/generate-passwd/).
+_SCRIPT_DIR = Path(__file__).resolve().parent
+WORDLIST_PATHS = (
+    _SCRIPT_DIR / "wordlist.txt",
+    _SCRIPT_DIR.parent / "share" / PROG / "wordlist.txt",
+    Path("/usr/local/share") / PROG / "wordlist.txt",
+    Path("/usr/share") / PROG / "wordlist.txt",
+    Path("/usr/share/dict/words"),
+)
+
+rng = secrets.SystemRandom()
+
+
+class PasswdError(Exception):
+    """Anything that should exit with a message instead of a traceback."""
+
+
+def load_words():
+    """Return the wordlist as a list, from $GENERATE_PASSWD_WORDLIST or WORDLIST_PATHS."""
+    override = os.environ.get("GENERATE_PASSWD_WORDLIST")
+    candidates = [Path(override)] if override else list(WORDLIST_PATHS)
+
+    for path in candidates:
+        try:
+            raw = path.read_text(encoding="utf-8", errors="ignore")
+        except OSError:
+            continue
+        words = [w for w in (line.strip() for line in raw.splitlines()) if w.isalpha() and w.isascii()]
+        if len(words) >= 100:
+            return sorted(set(w.lower() for w in words))
+
+    if override:
+        raise PasswdError(f"no usable wordlist at {override}")
+    raise PasswdError(
+        "no wordlist found; looked in "
+        + ", ".join(str(p) for p in WORDLIST_PATHS)
+        + "\nSet GENERATE_PASSWD_WORDLIST=/path/to/wordlist.txt, or use --string."
+    )
+
+
+def random_string(length, mixed_case):
+    """A random alphanumeric string of the given length."""
+    alphabet = string.ascii_lowercase + string.digits
+    if mixed_case:
+        alphabet += string.ascii_uppercase
+    return "".join(rng.choice(alphabet) for _ in range(length))
+
+
+def random_words(words, count, separator, mixed_case):
+    """A passphrase of `count` words joined by `separator`."""
+    picked = [rng.choice(words) for _ in range(count)]
+    if mixed_case:
+        # Capitalise each word independently, so the pattern is not predictable.
+        picked = [w.capitalize() if rng.getrandbits(1) else w for w in picked]
+    return separator.join(picked)
+
+
+def parse_args(argv=None):
+    parser = argparse.ArgumentParser(
+        prog=PROG,
+        description=__doc__,
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+    parser.add_argument(
+        "-l", "--length", type=int, default=DEFAULT_LENGTH,
+        help="password length in characters (string mode only)",
+    )
+    parser.add_argument(
+        "-m", "--mixed-case", action=argparse.BooleanOptionalAction, default=True,
+        help="mix lowercase and uppercase",
+    )
+    parser.add_argument(
+        "-s", "--string", action="store_true",
+        help="generate a random character string instead of words",
+    )
+    parser.add_argument(
+        "-w", "--words", action="store_true",
+        help="generate words (the default; ignored when --string is given)",
+    )
+    parser.add_argument(
+        "--word-separator", default=DEFAULT_WORD_SEPARATOR, metavar="CHAR",
+        help="what to put between the words",
+    )
+    parser.add_argument(
+        "-c", "--word-count", type=int, default=DEFAULT_WORD_COUNT, metavar="N",
+        help="how many words the password contains (word mode only)",
+    )
+    parser.add_argument(
+        "-q", "--quantity", type=int, default=DEFAULT_QUANTITY, metavar="N",
+        help="how many passwords to generate",
+    )
+    parser.add_argument("-V", "--version", action="version", version=f"{PROG} {__version__}")
+
+    args = parser.parse_args(argv)
+    # --string wins over --words, and word mode is the default otherwise.
+    args.words = not args.string
+    return args
+
+
+def generate(args):
+    if args.quantity < 1:
+        raise PasswdError("--quantity must be at least 1")
+
+    if args.string:
+        if args.length < 1:
+            raise PasswdError("--length must be at least 1")
+        return [random_string(args.length, args.mixed_case) for _ in range(args.quantity)]
+
+    if args.word_count < 1:
+        raise PasswdError("--word-count must be at least 1")
+    words = load_words()
+    return [
+        random_words(words, args.word_count, args.word_separator, args.mixed_case)
+        for _ in range(args.quantity)
+    ]
+
+
+def main(argv=None):
+    args = parse_args(argv)
+    try:
+        for password in generate(args):
+            print(password)
+    except PasswdError as exc:
+        print(f"{PROG}: {exc}", file=sys.stderr)
+        return 1
+    except BrokenPipeError:
+        # e.g. `generate-passwd -q 1000 | head`
+        os.dup2(os.open(os.devnull, os.O_WRONLY), sys.stdout.fileno())
+        return 0
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
