@@ -1,13 +1,18 @@
 # generate-passwd
 
 A small CLI that prints random passwords. Two modes: word phrases (the default)
-and random character strings.
+and random character strings. Words come from a Finnish list by default, with
+English available via `--language en`.
 
 ```
 $ generate-passwd
-Bossed-snorting-aorta-holistic-diners-Outlying-haired-Unwinds
-sitting-Fishy-pimentos-greeting-waiter-gadgets-Minces-Striated
+lapio-takertua-seniori-muija-Joteskin-kudin-keinu-Diakuva
+kuroa-Sektori-Viljelys-nauttia-aromikas-kidukset-Bluffi-Jäätie
 ...
+
+$ generate-passwd --language en --word-count 4 --quantity 2
+withdraw-Surly-devalues-Gabbiest
+bugging-Fiches-Treaties-Biggie
 
 $ generate-passwd --string --length 16 --quantity 2
 jPB8WEeVg4JN6Buk
@@ -25,9 +30,9 @@ make install PREFIX=~/.local
 sudo make uninstall
 ```
 
-`make install` puts the script in `$PREFIX/bin` and the wordlist in
-`$PREFIX/share/generate-passwd/wordlist.txt`. The script finds the wordlist
-relative to its own location, so any prefix works.
+`make install` puts the script in `$PREFIX/bin` and the wordlists in
+`$PREFIX/share/generate-passwd/`. The script finds them relative to its own
+location, so any prefix works.
 
 ## Options
 
@@ -37,6 +42,7 @@ relative to its own location, so any prefix works.
 | `-m`, `--mixed-case` / `--no-mixed-case` | on | Mix lowercase and uppercase |
 | `-s`, `--string` | off | Generate a random character string |
 | `-w`, `--words` | default mode | Generate words; ignored when `--string` is given |
+| `--language CODE` | `fi` | Which wordlist to draw from: `fi` or `en` (word mode only) |
 | `--word-separator CHAR` | `-` | What to put between the words |
 | `-c`, `--word-count N` | `8` | How many words the password contains |
 | `-q`, `--quantity N` | `5` | How many passwords to generate |
@@ -49,39 +55,59 @@ the capitalisation pattern itself carries a bit of entropy rather than being a
 fixed Title-Case shape. In string mode the alphabet is `a-z0-9`, plus `A-Z`
 when `--mixed-case` is on.
 
-## Strength
+Finnish passwords contain `ä` and `ö`. That is deliberate — it is what makes
+them Finnish — but a few systems still reject non-ASCII in a password field.
+Use `--language en` or `--string` for those.
 
-The bundled wordlist has 34,790 words, so each word is worth ~15.1 bits, plus 1
-bit for its random capitalisation.
+## Strength
 
 | Command | Entropy |
 | --- | --- |
-| `generate-passwd` (8 words, mixed case) | ~129 bits |
-| `generate-passwd --no-mixed-case` | ~121 bits |
+| `generate-passwd` (8 Finnish words, mixed case) | ~124 bits |
+| `generate-passwd --no-mixed-case` | ~116 bits |
+| `generate-passwd --language en` (8 English words, mixed case) | ~129 bits |
+| `generate-passwd --language en --no-mixed-case` | ~121 bits |
 | `generate-passwd -s` (32 chars, mixed case) | ~191 bits |
 | `generate-passwd -s --no-mixed-case` | ~165 bits |
 
-## Wordlist
+Per word: 14.5 bits from `wordlist-fi.txt` (22,852 words) or 15.1 bits from
+`wordlist-en.txt` (34,790 words), plus 1 bit for its random capitalisation.
 
-`wordlist.txt` is generated from the Debian/Ubuntu `wamerican` dictionary:
-lowercase ASCII words of 4-8 letters, minus a blocklist of slurs and profanity.
+## Wordlists
+
+Both lists hold lowercase words of 4-8 letters with a blocklist of slurs and
+profanity removed. Rebuild them with:
 
 ```sh
-make wordlist                              # from /usr/share/dict/american-english
-./tools/build-wordlist.sh /path/to/dict > wordlist.txt
+make wordlist                                  # both
+./tools/build-wordlist.sh en > wordlist-en.txt # from /usr/share/dict/american-english
+./tools/build-wordlist.sh fi > wordlist-fi.txt # downloads the Kotus list
+./tools/build-wordlist.sh fi /path/to/local/kaikkisanat.txt > wordlist-fi.txt
 ```
 
-To use a different list without reinstalling, point `GENERATE_PASSWD_WORDLIST`
-at it (one word per line):
+Adding a language is just dropping a `wordlist-<code>.txt` (one word per line)
+next to the others; `--language <code>` picks it up. To use a list without
+installing it, point `GENERATE_PASSWD_WORDLIST` at the file — it overrides
+`--language` entirely:
 
 ```sh
 GENERATE_PASSWD_WORDLIST=~/eff_large_wordlist.txt generate-passwd
 ```
 
 Otherwise the script searches, in order: next to itself,
-`../share/generate-passwd/wordlist.txt` relative to itself,
-`/usr/local/share/generate-passwd/wordlist.txt`,
-`/usr/share/generate-passwd/wordlist.txt`, and finally `/usr/share/dict/words`.
+`../share/generate-passwd/` relative to itself, `/usr/local/share/generate-passwd/`,
+and `/usr/share/generate-passwd/`, falling back to `/usr/share/dict/words` for
+`--language en`.
+
+### Sources and licences
+
+- `wordlist-en.txt` — derived from `/usr/share/dict/american-english`
+  (Debian/Ubuntu `wamerican`, public domain / SCOWL permissive licence).
+- `wordlist-fi.txt` — derived from *Nykysuomen sanalista*, © Kotimaisten
+  kielten keskus (Institute for the Languages of Finland), released under the
+  **GNU LGPL**: <https://kaino.kotus.fi/sanat/nykysuomi/>. Retrieved via
+  <https://github.com/hugovk/everyfinnishword>. Redistributing this file, or a
+  build of it, carries the LGPL's attribution requirement.
 
 ## Tests
 

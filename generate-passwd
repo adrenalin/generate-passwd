@@ -3,31 +3,37 @@
 
 import argparse
 import os
+import re
 import secrets
 import string
 import sys
 from pathlib import Path
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 
 PROG = "generate-passwd"
 
 DEFAULT_LENGTH = 32
+DEFAULT_LANGUAGE = "fi"
 DEFAULT_WORD_SEPARATOR = "-"
 DEFAULT_WORD_COUNT = 8
 DEFAULT_QUANTITY = 5
 
-# Where wordlist.txt is looked up, in order. The first two entries let the
-# script run straight out of a checkout or from any --prefix install
+# Where wordlist-<language>.txt is looked up, in order. The first two entries
+# let the script run straight out of a checkout or from any --prefix install
 # (/usr/local/bin/generate-passwd -> /usr/local/share/generate-passwd/).
 _SCRIPT_DIR = Path(__file__).resolve().parent
-WORDLIST_PATHS = (
-    _SCRIPT_DIR / "wordlist.txt",
-    _SCRIPT_DIR.parent / "share" / PROG / "wordlist.txt",
-    Path("/usr/local/share") / PROG / "wordlist.txt",
-    Path("/usr/share") / PROG / "wordlist.txt",
-    Path("/usr/share/dict/words"),
+WORDLIST_DIRS = (
+    _SCRIPT_DIR,
+    _SCRIPT_DIR.parent / "share" / PROG,
+    Path("/usr/local/share") / PROG,
+    Path("/usr/share") / PROG,
 )
+
+# Last resort for English only, so the script stays useful uninstalled.
+SYSTEM_DICTS = {"en": Path("/usr/share/dict/words")}
+
+LANGUAGE_RE = re.compile(r"\A[a-z][a-z0-9_-]{1,15}\Z")
 
 rng = secrets.SystemRandom()
 
@@ -36,26 +42,55 @@ class PasswdError(Exception):
     """Anything that should exit with a message instead of a traceback."""
 
 
-def load_words():
-    """Return the wordlist as a list, from $GENERATE_PASSWD_WORDLIST or WORDLIST_PATHS."""
-    override = os.environ.get("GENERATE_PASSWD_WORDLIST")
-    candidates = [Path(override)] if override else list(WORDLIST_PATHS)
+def read_wordlist(path):
+    """Return the words in `path`, or None if it is missing or unusable."""
+    try:
+        raw = path.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        return None
+    words = sorted({w.lower() for w in (line.strip() for line in raw.splitlines()) if w.isalpha()})
+    return words if len(words) >= 100 else None
 
-    for path in candidates:
+
+def available_languages():
+    """Language codes with a wordlist somewhere in WORDLIST_DIRS."""
+    found = set()
+    for directory in WORDLIST_DIRS:
         try:
-            raw = path.read_text(encoding="utf-8", errors="ignore")
+            entries = directory.glob("wordlist-*.txt")
+            found.update(p.name[len("wordlist-"):-len(".txt")] for p in entries)
         except OSError:
             continue
-        words = [w for w in (line.strip() for line in raw.splitlines()) if w.isalpha() and w.isascii()]
-        if len(words) >= 100:
-            return sorted(set(w.lower() for w in words))
+    found.update(lang for lang, path in SYSTEM_DICTS.items() if path.exists())
+    return sorted(found)
 
+
+def load_words(language):
+    """Return the wordlist for `language`, honouring $GENERATE_PASSWD_WORDLIST."""
+    override = os.environ.get("GENERATE_PASSWD_WORDLIST")
     if override:
-        raise PasswdError(f"no usable wordlist at {override}")
+        words = read_wordlist(Path(override))
+        if words is None:
+            raise PasswdError(f"no usable wordlist at {override}")
+        return words
+
+    if not LANGUAGE_RE.match(language):
+        raise PasswdError(f"invalid --language {language!r}")
+
+    candidates = [d / f"wordlist-{language}.txt" for d in WORDLIST_DIRS]
+    if language in SYSTEM_DICTS:
+        candidates.append(SYSTEM_DICTS[language])
+    for path in candidates:
+        words = read_wordlist(path)
+        if words is not None:
+            return words
+
+    known = available_languages()
     raise PasswdError(
-        "no wordlist found; looked in "
-        + ", ".join(str(p) for p in WORDLIST_PATHS)
-        + "\nSet GENERATE_PASSWD_WORDLIST=/path/to/wordlist.txt, or use --string."
+        f"no wordlist for language {language!r}; looked for "
+        + ", ".join(str(p) for p in candidates)
+        + ("\nAvailable: " + ", ".join(known) if known else "")
+        + "\nOr set GENERATE_PASSWD_WORDLIST=/path/to/wordlist.txt, or use --string."
     )
 
 
@@ -99,6 +134,10 @@ def parse_args(argv=None):
         help="generate words (the default; ignored when --string is given)",
     )
     parser.add_argument(
+        "--language", default=DEFAULT_LANGUAGE, metavar="CODE",
+        help="which wordlist to draw from, e.g. fi or en (word mode only)",
+    )
+    parser.add_argument(
         "--word-separator", default=DEFAULT_WORD_SEPARATOR, metavar="CHAR",
         help="what to put between the words",
     )
@@ -129,7 +168,7 @@ def generate(args):
 
     if args.word_count < 1:
         raise PasswdError("--word-count must be at least 1")
-    words = load_words()
+    words = load_words(args.language)
     return [
         random_words(words, args.word_count, args.word_separator, args.mixed_case)
         for _ in range(args.quantity)
