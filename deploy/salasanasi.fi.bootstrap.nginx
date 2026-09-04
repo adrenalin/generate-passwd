@@ -1,0 +1,21 @@
+# salasanasi.fi — väliaikainen HTTP-konfiguraatio ensimmäistä varmennetta varten.
+# tools/deploy-site.sh asentaa tämän vain, jos Let's Encrypt -varmennetta ei vielä ole,
+# ja korvaa sen salasanasi.fi.nginx-tiedostolla heti certbotin jälkeen.
+# SPDX-License-Identifier: LGPL-3.0-or-later
+
+server {
+	listen 80;
+	listen [::]:80;
+	server_name salasanasi.fi www.salasanasi.fi;
+	root /var/www/salasanasi.fi;
+	index index.html;
+	charset utf-8;
+
+	location ^~ /.well-known/acme-challenge/ {
+		root /var/www/salasanasi.fi;
+	}
+
+	location / {
+		try_files $uri $uri/ =404;
+	}
+}

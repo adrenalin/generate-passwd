@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>salasanasi.fi – vahvat salasanat suomeksi</title>
+<meta name="description" content="Luo vahvoja salasanoja suomenkielisistä sanoista. Kaikki tapahtuu selaimessasi – salasanoja ei lähetetä minnekään.">
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="/style.css">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+
+<header class="site-header">
+	<a class="wordmark" href="/">salasanasi<span>.fi</span></a>
+	<p class="tagline">Vahvoja salasanoja suomen kielen sanoista. Kaikki tapahtuu selaimessasi.</p>
+</header>
+
+<main>
+
+<section class="generator" aria-labelledby="luo">
+	<h1 id="luo" class="visually-hidden">Luo salasanoja</h1>
+
+	<div class="modes" role="radiogroup" aria-label="Salasanan tyyppi">
+		<button type="button" class="mode is-active" data-mode="words" role="radio" aria-checked="true">Sanoja</button>
+		<button type="button" class="mode" data-mode="string" role="radio" aria-checked="false">Merkkijono</button>
+	</div>
+
+	<div class="controls">
+		<div class="field" data-for="words">
+			<label for="language">Kieli</label>
+			<select id="language">
+				<option value="fi" selected>suomi</option>
+				<option value="en">englanti</option>
+			</select>
+		</div>
+
+		<div class="field" data-for="words">
+			<label for="word-count">Sanoja <output for="word-count" id="word-count-out">8</output></label>
+			<input type="range" id="word-count" min="2" max="16" step="1" value="8">
+		</div>
+
+		<div class="field" data-for="words">
+			<label for="word-separator">Erotin</label>
+			<select id="word-separator">
+				<option value="-" selected>- (viiva)</option>
+				<option value=".">. (piste)</option>
+				<option value="_">_ (alaviiva)</option>
+				<option value=" ">&nbsp; (välilyönti)</option>
+				<option value="">ei erotinta</option>
+			</select>
+		</div>
+
+		<div class="field" data-for="string">
+			<label for="length">Pituus <output for="length" id="length-out">32</output> merkkiä</label>
+			<input type="range" id="length" min="8" max="128" step="1" value="32">
+		</div>
+
+		<div class="field">
+			<label for="quantity">Kuinka monta <output for="quantity" id="quantity-out">5</output></label>
+			<input type="range" id="quantity" min="1" max="20" step="1" value="5">
+		</div>
+
+		<div class="field field-check">
+			<input type="checkbox" id="mixed-case" checked>
+			<label for="mixed-case">Isoja ja pieniä kirjaimia</label>
+		</div>
+	</div>
+
+	<div class="actions">
+		<button type="button" id="regenerate" class="primary">Arvo uudet</button>
+		<p class="strength" id="strength" aria-live="polite"></p>
+	</div>
+
+	<ol class="passwords" id="passwords" aria-live="polite" aria-label="Luodut salasanat"></ol>
+	<p class="status" id="status" role="status"></p>
+</section>
+
+<section class="prose" aria-labelledby="turvallisuus">
+	<h2 id="turvallisuus">Salasanat eivät lähde koneeltasi</h2>
+	<p>
+		Salasanat arvotaan selaimessasi <code>crypto.getRandomValues()</code>-funktiolla, joka
+		hakee satunnaisuuden käyttöjärjestelmän salausvahvasta satunnaislukulähteestä. Palvelin
+		lähettää vain sivun ja sanalistan – se ei koskaan näe, mitä koneellasi syntyy. Sivulla ei
+		ole seurantaa, evästeitä eikä ulkopuolisia skriptejä.
+	</p>
+	<p>
+		Voit myös katkaista verkkoyhteyden ennen arpomista tai tallentaa sivun koneellesi: se
+		toimii yhtä hyvin ilman verkkoa, kunhan sanalista on kerran ladattu.
+	</p>
+
+	<h2 id="miksi-sanoja">Miksi sanoja eikä sekamerkkejä?</h2>
+	<p>
+		<strong>rakenne-Ovela-tuuli-mätäs</strong> on helpompi lukea, sanella puhelimessa ja
+		naputella puhelimen näppäimistöllä kuin <strong>x7Qp!2vZ</strong> – ja silti selvästi
+		vahvempi. Vahvuus tulee sanojen määrästä, ei kikkailusta: kahdeksan satunnaista sanaa
+		suomen kielen sanalistasta on noin
+		<strong>124 bittiä</strong> entropiaa. Se on enemmän kuin mikään nykyinen tai
+		lähitulevaisuuden tietokone pystyy arvaamaan.
+	</p>
+	<p>
+		Sanalista on suomen kielen yleissanastoa, joten mukana on ä- ja ö-kirjaimia. Ne ovat osa
+		suomea, mutta jotkin vanhat järjestelmät eivät hyväksy niitä salasanakentässä. Sellaisia
+		varten valitse <em>englanti</em> tai <em>merkkijono</em>.
+	</p>
+
+	<h2 id="entropia">Kuinka vahva salasana on?</h2>
+	<table class="strength-table">
+		<thead>
+			<tr><th>Asetus</th><th>Entropia</th></tr>
+		</thead>
+		<tbody>
+			<tr><td>8 suomenkielistä sanaa, isoja ja pieniä kirjaimia</td><td>~124 bittiä</td></tr>
+			<tr><td>8 suomenkielistä sanaa, pelkkiä pieniä</td><td>~116 bittiä</td></tr>
+			<tr><td>8 englanninkielistä sanaa, isoja ja pieniä</td><td>~129 bittiä</td></tr>
+			<tr><td>32 merkkiä, isoja ja pieniä kirjaimia</td><td>~191 bittiä</td></tr>
+			<tr><td>32 merkkiä, pelkkiä pieniä ja numeroita</td><td>~165 bittiä</td></tr>
+		</tbody>
+	</table>
+	<p class="note">
+		Vertailun vuoksi: yli 80 bittiä riittää käytännössä kaikkeen, ja 128 bittiä vastaa
+		vahvaa salausavainta. Alle 60 bitin salasanoja ei kannata käyttää mihinkään tärkeään.
+	</p>
+
+	<h2 id="komentorivi">Sama työkalu komentoriville</h2>
+	<p>
+		Sivun takana on <code>generate-passwd</code>, pieni Python-komentorivityökalu, joka
+		tekee saman asian päätteessä eikä tarvitse verkkoa lainkaan:
+	</p>
+<pre><code>git clone https://github.com/adrenalin/generate-passwd.git
+cd generate-passwd
+sudo make install
+
+generate-passwd                        # 5 salasanaa, 8 suomenkielistä sanaa
+generate-passwd --language en -c 4     # 4 englanninkielistä sanaa
+generate-passwd --string --length 16   # 16 merkin merkkijono</code></pre>
+
+	<h2 id="sanalistat">Sanalistat</h2>
+	<p>
+		Suomenkielinen lista on <a href="https://kaino.kotus.fi/sanat/nykysuomi/">Kotimaisten
+		kielten keskuksen <em>Nykysuomen sanalista</em></a> (GNU LGPL) rajattuna 4–8 kirjaimen
+		sanoihin: <strong id="fi-count">22 852</strong> sanaa. Englanninkielinen lista tulee
+		Debianin <code>wamerican</code>-sanakirjasta: <strong id="en-count">34 790</strong>
+		sanaa. Molemmista on karsittu haukkumasanat ja karkeudet.
+	</p>
+	<p>
+		Voit ladata listat sellaisenaan:
+		<a href="/wordlist-fi.txt" download>wordlist-fi.txt</a> ja
+		<a href="/wordlist-en.txt" download>wordlist-en.txt</a>.
+	</p>
+</section>
+
+</main>
+
+<footer class="site-footer">
+	<p>
+		<a href="https://github.com/adrenalin/generate-passwd">Lähdekoodi GitHubissa</a> ·
+		GNU LGPL v3 tai uudempi ·
+		sanasto © <a href="https://kaino.kotus.fi/sanat/nykysuomi/">Kotimaisten kielten keskus</a>
+	</p>
+</footer>
+
+<script src="/app.js"></script>
+</body>
+</html>

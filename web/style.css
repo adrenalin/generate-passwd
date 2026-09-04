@@ -1,0 +1,270 @@
+/* salasanasi.fi — SPDX-License-Identifier: LGPL-3.0-or-later */
+
+:root {
+	--bg: #f7f6f3;
+	--panel: #ffffff;
+	--ink: #16181d;
+	--ink-soft: #565b66;
+	--line: #e0ded8;
+	--accent: #1f5f4b;
+	--accent-ink: #ffffff;
+	--accent-soft: #e5f0ea;
+	--code-bg: #eeece7;
+	--radius: 10px;
+	--mono: ui-monospace, "SF Mono", "JetBrains Mono", "DejaVu Sans Mono", Menlo, Consolas, monospace;
+	--sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--bg: #14161a;
+		--panel: #1c1f25;
+		--ink: #e9eaec;
+		--ink-soft: #9aa1ad;
+		--line: #2c313a;
+		--accent: #4fbf95;
+		--accent-ink: #10241d;
+		--accent-soft: #1e2f2a;
+		--code-bg: #23272f;
+	}
+}
+
+* { box-sizing: border-box; }
+
+body {
+	margin: 0;
+	background: var(--bg);
+	color: var(--ink);
+	font: 16px/1.65 var(--sans);
+	-webkit-text-size-adjust: 100%;
+}
+
+main { max-width: 46rem; margin: 0 auto; padding: 0 1.25rem 4rem; }
+
+a { color: var(--accent); text-underline-offset: 2px; }
+a:hover { text-decoration-thickness: 2px; }
+
+.visually-hidden {
+	position: absolute; width: 1px; height: 1px;
+	margin: -1px; padding: 0; overflow: hidden;
+	clip-path: inset(50%); white-space: nowrap;
+}
+
+/* ---- header ---- */
+
+.site-header {
+	max-width: 46rem;
+	margin: 0 auto;
+	padding: 3rem 1.25rem 1.75rem;
+}
+
+.wordmark {
+	display: inline-block;
+	font-size: 1.6rem;
+	font-weight: 700;
+	letter-spacing: -0.02em;
+	color: var(--ink);
+	text-decoration: none;
+}
+.wordmark span { color: var(--ink-soft); font-weight: 400; }
+
+.tagline {
+	margin: 0.35rem 0 0;
+	color: var(--ink-soft);
+	max-width: 34rem;
+}
+
+/* ---- generator ---- */
+
+.generator {
+	background: var(--panel);
+	border: 1px solid var(--line);
+	border-radius: var(--radius);
+	padding: 1.25rem;
+}
+
+.modes {
+	display: inline-flex;
+	gap: 2px;
+	padding: 2px;
+	background: var(--code-bg);
+	border-radius: 999px;
+	margin-bottom: 1.25rem;
+}
+
+.mode {
+	appearance: none;
+	border: 0;
+	background: transparent;
+	color: var(--ink-soft);
+	font: 500 0.9rem var(--sans);
+	padding: 0.4rem 1rem;
+	border-radius: 999px;
+	cursor: pointer;
+}
+.mode.is-active { background: var(--panel); color: var(--ink); box-shadow: 0 1px 2px rgb(0 0 0 / 0.12); }
+.mode:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.controls {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+	gap: 1rem 1.5rem;
+	align-items: end;
+}
+
+.field { min-width: 0; }
+.field[hidden] { display: none; }
+
+.field label {
+	display: block;
+	font-size: 0.82rem;
+	font-weight: 500;
+	color: var(--ink-soft);
+	margin-bottom: 0.3rem;
+}
+
+.field output {
+	font-variant-numeric: tabular-nums;
+	font-weight: 700;
+	color: var(--ink);
+}
+
+.field select {
+	width: 100%;
+	font: inherit;
+	color: inherit;
+	padding: 0.45rem 0.6rem;
+	background: var(--bg);
+	border: 1px solid var(--line);
+	border-radius: 7px;
+}
+
+.field input[type="range"] {
+	width: 100%;
+	accent-color: var(--accent);
+	margin: 0.35rem 0 0;
+}
+
+.field-check {
+	display: flex;
+	align-items: center;
+	gap: 0.55rem;
+	align-self: center;
+	padding-top: 0.9rem;
+}
+.field-check input { width: 1.05rem; height: 1.05rem; accent-color: var(--accent); margin: 0; }
+.field-check label { margin: 0; color: var(--ink); font-weight: 400; font-size: 0.95rem; }
+
+.actions {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.75rem 1rem;
+	margin: 1.5rem 0 1rem;
+	padding-top: 1.25rem;
+	border-top: 1px solid var(--line);
+}
+
+.primary {
+	appearance: none;
+	border: 0;
+	background: var(--accent);
+	color: var(--accent-ink);
+	font: 600 0.95rem var(--sans);
+	padding: 0.6rem 1.3rem;
+	border-radius: 7px;
+	cursor: pointer;
+}
+.primary:hover { filter: brightness(1.08); }
+.primary:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+.strength { margin: 0; font-size: 0.85rem; color: var(--ink-soft); }
+.strength b { color: var(--ink); font-variant-numeric: tabular-nums; }
+
+/* ---- results ---- */
+
+.passwords { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+
+.passwords li {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	background: var(--bg);
+	border: 1px solid var(--line);
+	border-radius: 7px;
+	padding: 0.55rem 0.55rem 0.55rem 0.8rem;
+}
+
+.passwords .value {
+	flex: 1;
+	min-width: 0;
+	font: 0.95rem/1.55 var(--mono);
+	/* Katkaise mieluiten erottimen kohdalta, ei keskeltä sanaa. */
+	overflow-wrap: anywhere;
+	user-select: all;
+}
+
+.copy {
+	flex: none;
+	appearance: none;
+	background: transparent;
+	border: 1px solid var(--line);
+	color: var(--ink-soft);
+	font: 500 0.8rem var(--sans);
+	padding: 0.3rem 0.7rem;
+	border-radius: 6px;
+	cursor: pointer;
+}
+.copy:hover { border-color: var(--accent); color: var(--accent); }
+.copy:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.copy.is-done { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+
+.status { margin: 0.75rem 0 0; font-size: 0.85rem; color: var(--ink-soft); min-height: 1.4em; }
+.status.is-error { color: #c4442f; }
+@media (prefers-color-scheme: dark) { .status.is-error { color: #ff8a72; } }
+
+/* ---- prose ---- */
+
+.prose { margin-top: 3.5rem; }
+.prose h2 { font-size: 1.15rem; margin: 2.5rem 0 0.6rem; letter-spacing: -0.01em; }
+.prose h2:first-child { margin-top: 0; }
+.prose p { margin: 0 0 0.9rem; }
+.prose .note { font-size: 0.9rem; color: var(--ink-soft); }
+
+code {
+	font: 0.88em var(--mono);
+	background: var(--code-bg);
+	padding: 0.12em 0.35em;
+	border-radius: 4px;
+}
+
+pre {
+	background: var(--code-bg);
+	border-radius: var(--radius);
+	padding: 0.9rem 1rem;
+	overflow-x: auto;
+}
+pre code { background: none; padding: 0; font-size: 0.85rem; line-height: 1.7; }
+
+.strength-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 0.92rem;
+	margin: 0 0 1rem;
+}
+.strength-table th,
+.strength-table td { text-align: left; padding: 0.45rem 0.6rem; border-bottom: 1px solid var(--line); }
+.strength-table th { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-soft); }
+.strength-table td:last-child { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+/* ---- footer ---- */
+
+.site-footer {
+	max-width: 46rem;
+	margin: 0 auto;
+	padding: 2rem 1.25rem 3rem;
+	border-top: 1px solid var(--line);
+	font-size: 0.85rem;
+	color: var(--ink-soft);
+}
+.site-footer p { margin: 0; }

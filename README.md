@@ -108,6 +108,26 @@ and `/usr/share/generate-passwd/`, falling back to `/usr/share/dict/words` for
   GNU LGPL: <https://kaino.kotus.fi/sanat/nykysuomi/>. Retrieved via
   <https://github.com/hugovk/everyfinnishword>.
 
+## Website
+
+<https://salasanasi.fi> is the same generator as a static page, in Finnish.
+It draws from the same two wordlists and does everything in the browser with
+`crypto.getRandomValues()` — nothing is sent to the server, and the page loads
+no third-party resources at all (enforced by a `default-src 'none'` CSP).
+
+The source is in `web/`, the nginx site in `deploy/`. To publish:
+
+```sh
+./tools/deploy-site.sh              # host defaults to kaktus.cc
+./tools/deploy-site.sh other.host
+```
+
+The script stages `web/` plus the wordlists, rsyncs them to
+`/var/www/salasanasi.fi`, installs the nginx site and reloads. On a host with
+no certificate yet it first installs `deploy/salasanasi.fi.bootstrap.nginx`
+(HTTP only) so certbot can answer the ACME challenge, then swaps in the HTTPS
+config. Re-running it later just updates the files.
+
 ## Tests
 
 ```sh

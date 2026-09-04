@@ -1,0 +1,86 @@
+# salasanasi.fi — staattinen sivusto, asennetaan tools/deploy-site.sh -skriptillä.
+# SPDX-License-Identifier: LGPL-3.0-or-later
+#
+# Välimuistiotsakkeet asetetaan expires-direktiivillä, ei add_headerilla:
+# location-tason add_header korvaisi kaikki server-tasolta perityt otsakkeet.
+
+server {
+	listen 80;
+	listen [::]:80;
+	server_name salasanasi.fi www.salasanasi.fi;
+
+	# Certbotin uusinnat kulkevat aina HTTP:n yli.
+	location ^~ /.well-known/acme-challenge/ {
+		root /var/www/salasanasi.fi;
+	}
+
+	location / {
+		return 301 https://salasanasi.fi$request_uri;
+	}
+}
+
+server {
+	listen 443 ssl;
+	listen [::]:443 ssl;
+	http2 on;
+	server_name www.salasanasi.fi;
+
+	ssl_certificate /etc/letsencrypt/live/salasanasi.fi/fullchain.pem;
+	ssl_certificate_key /etc/letsencrypt/live/salasanasi.fi/privkey.pem;
+	include /etc/letsencrypt/options-ssl-nginx.conf;
+	ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+	return 301 https://salasanasi.fi$request_uri;
+}
+
+server {
+	listen 443 ssl;
+	listen [::]:443 ssl;
+	http2 on;
+	server_name salasanasi.fi;
+	root /var/www/salasanasi.fi;
+	index index.html;
+	charset utf-8;
+
+	access_log /var/log/nginx/accesslogs/salasanasi.fi.log;
+
+	ssl_certificate /etc/letsencrypt/live/salasanasi.fi/fullchain.pem;
+	ssl_certificate_key /etc/letsencrypt/live/salasanasi.fi/privkey.pem;
+	include /etc/letsencrypt/options-ssl-nginx.conf;
+	ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+	# Kaikki tapahtuu selaimessa: sivu ei tarvitse yhtään ulkopuolista resurssia.
+	add_header Content-Security-Policy "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'" always;
+	add_header Strict-Transport-Security "max-age=63072000" always;
+	add_header Referrer-Policy "no-referrer" always;
+	add_header X-Content-Type-Options "nosniff" always;
+	add_header Cross-Origin-Opener-Policy "same-origin" always;
+	add_header Permissions-Policy "geolocation=(), microphone=(), camera=()" always;
+
+	gzip on;
+	gzip_vary on;
+	gzip_min_length 1024;
+	gzip_types text/plain text/css application/javascript image/svg+xml;
+
+	location = /index.html {
+		expires -1;
+	}
+
+	location ~* \.(css|js|svg)$ {
+		expires 1h;
+	}
+
+	# Sanalistat ovat isoja ja muuttuvat harvoin.
+	location ~* ^/wordlist-[a-z]+\.txt$ {
+		default_type text/plain;
+		expires 7d;
+	}
+
+	location / {
+		try_files $uri $uri/ =404;
+	}
+
+	location ~ /\. {
+		deny all;
+	}
+}
