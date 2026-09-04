@@ -290,5 +290,4 @@
 	el.regenerate.addEventListener('click', generate);
 
 	setMode('words');
-	loadWords('en').then(function (words) { updateCounts('en', words.length); }, function () {});
 })();

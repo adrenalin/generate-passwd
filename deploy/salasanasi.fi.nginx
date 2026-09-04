@@ -53,13 +53,7 @@ server {
 	include /etc/letsencrypt/options-ssl-nginx.conf;
 	ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
-	# Kaikki tapahtuu selaimessa: sivu ei tarvitse yhtään ulkopuolista resurssia.
-	add_header Content-Security-Policy "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'" always;
-	add_header Strict-Transport-Security "max-age=63072000" always;
-	add_header Referrer-Policy "no-referrer" always;
-	add_header X-Content-Type-Options "nosniff" always;
-	add_header Cross-Origin-Opener-Policy "same-origin" always;
-	add_header Permissions-Policy "geolocation=(), microphone=(), camera=()" always;
+	include snippets/salasanasi-headers.conf;
 
 	gzip on;
 	gzip_vary on;
@@ -70,8 +64,16 @@ server {
 		expires -1;
 	}
 
-	location ~* \.(css|js|svg)$ {
-		expires 1h;
+	# Tyylit ja skriptit viitataan HTML:stä sisällön tiivisteellä (?v=…, ks.
+	# tools/deploy-site.sh), joten ne ovat käytännössä muuttumattomia: uusi julkaisu
+	# tuottaa uuden osoitteen eikä vanhentunutta vastausta voi tarjoilla.
+	location ~* \.(css|js)$ {
+		add_header Cache-Control "public, max-age=31536000, immutable" always;
+		include snippets/salasanasi-headers.conf;   # add_header yllä pudottaisi nämä
+	}
+
+	location ~* \.svg$ {
+		expires 7d;
 	}
 
 	# Jakokuva (OpenGraph) muuttuu harvoin ja sitä hakevat lähinnä robotit.
@@ -79,9 +81,10 @@ server {
 		expires 7d;
 	}
 
-	# Kirjasintiedostot ovat muuttumattomia, ne saa pitää pitkään.
+	# Kirjasintiedostot on versioitu nimessä painon mukaan eivätkä ne muutu.
 	location ^~ /fonts/ {
-		expires 30d;
+		add_header Cache-Control "public, max-age=31536000, immutable" always;
+		include snippets/salasanasi-headers.conf;
 	}
 
 	# Sanalistat ovat isoja ja muuttuvat harvoin.
@@ -125,7 +128,7 @@ server {
 		# expires eikä add_header, jotta server-tason turvaotsakkeet periytyvät tänne.
 		proxy_hide_header Cache-Control;
 		proxy_hide_header Expires;
-		expires 1d;
+		expires 7d;
 	}
 
 	location = /stats/matomo.php {

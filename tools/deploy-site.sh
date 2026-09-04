@@ -47,6 +47,15 @@ trap 'rm -rf "$STAGE"' EXIT
 cp -R web/. "$STAGE/"
 cp wordlist-fi.txt wordlist-en.txt "$STAGE/"
 
+# Version the assets by content so they can be cached for a year without a deploy
+# ever serving a stale one. The filenames stay put — only the reference gains a
+# ?v=, which is enough to make it a different cache entry.
+for asset in style.css app.js analytics.js; do
+	version=$(sha256sum "$STAGE/$asset" | cut -c1-10)
+	sed -i "s|\"/$asset\"|\"/$asset?v=$version\"|g" "$STAGE"/*.html
+	echo "    $asset -> ?v=$version"
+done
+
 echo "==> copying to $HOST:$WEBROOT"
 ssh "$HOST" "sudo install -d -o www-data -g www-data -m 755 $WEBROOT"
 rsync -rlt --delete --chmod=D755,F644 --exclude '.well-known' \
@@ -55,7 +64,8 @@ rsync -rlt --delete --chmod=D755,F644 --exclude '.well-known' \
 
 echo "==> installing nginx site"
 scp -q "deploy/$SITE.nginx" "deploy/$SITE.bootstrap.nginx" \
-	deploy/salasanasi-shared.conf deploy/salasanasi-matomo-proxy.conf "$HOST:/tmp/"
+	deploy/salasanasi-shared.conf deploy/salasanasi-matomo-proxy.conf \
+	deploy/salasanasi-headers.conf "$HOST:/tmp/"
 ssh "$HOST" "set -eu
 	site=$SITE
 	webroot=$WEBROOT
@@ -66,6 +76,7 @@ ssh "$HOST" "set -eu
 	# joten väärässä järjestyksessä nginx -t kaatuisi.
 	sudo install -o root -g root -m 644 /tmp/salasanasi-shared.conf /etc/nginx/conf.d/salasanasi-shared.conf
 	sudo install -o root -g root -m 644 /tmp/salasanasi-matomo-proxy.conf /etc/nginx/snippets/salasanasi-matomo-proxy.conf
+	sudo install -o root -g root -m 644 /tmp/salasanasi-headers.conf /etc/nginx/snippets/salasanasi-headers.conf
 
 	install_conf() {
 		sudo install -o root -g root -m 644 \"/tmp/\$1\" \"/etc/nginx/sites-available/\$site\"
@@ -87,6 +98,6 @@ ssh "$HOST" "set -eu
 
 	install_conf \"\$site.nginx\"
 	rm -f \"/tmp/\$site.nginx\" \"/tmp/\$site.bootstrap.nginx\" \
-		/tmp/salasanasi-shared.conf /tmp/salasanasi-matomo-proxy.conf"
+		/tmp/salasanasi-shared.conf /tmp/salasanasi-matomo-proxy.conf /tmp/salasanasi-headers.conf"
 
 echo "==> done: https://www.$SITE/"
