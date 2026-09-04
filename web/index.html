@@ -5,22 +5,44 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>salasanasi.fi – vahvat salasanat suomeksi</title>
 <meta name="description" content="Luo vahvoja salasanoja suomenkielisistä sanoista. Kaikki tapahtuu selaimessasi – salasanoja ei lähetetä minnekään.">
-<meta name="color-scheme" content="light dark">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#2a6ebb">
+<link rel="canonical" href="https://www.salasanasi.fi/">
+<link rel="preload" href="/fonts/source-sans-3-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/source-sans-3-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/style.css">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 </head>
 <body>
 
 <header class="site-header">
-	<a class="wordmark" href="/">salasanasi<span>.fi</span></a>
-	<p class="tagline">Vahvoja salasanoja suomen kielen sanoista. Kaikki tapahtuu selaimessasi.</p>
+	<div class="bar">
+		<a class="wordmark" href="/">
+			<svg class="mark" viewBox="0 0 32 32" width="32" height="32" aria-hidden="true" focusable="false">
+				<rect width="32" height="32" rx="2" fill="#00357a"/>
+				<path d="M11 14v-3a5 5 0 0 1 10 0v3" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
+				<rect x="8" y="14" width="16" height="12" rx="1.5" fill="#fff"/>
+				<circle cx="12.5" cy="20" r="1.5" fill="#00357a"/>
+				<circle cx="16" cy="20" r="1.5" fill="#00357a"/>
+				<circle cx="19.5" cy="20" r="1.5" fill="#00357a"/>
+			</svg>
+			<span class="name">salasanasi<span class="tld">.fi</span></span>
+		</a>
+	</div>
 </header>
+
+<div class="hero">
+	<div class="hero-inner">
+		<h1 class="hero-title">Vahvoja salasanoja suomen kielen sanoista</h1>
+		<p class="hero-lead">
+			Salasanat arvotaan selaimessasi. Mitään ei lähetetä verkkoon, mitään ei tallenneta.
+		</p>
+	</div>
+</div>
 
 <main>
 
-<section class="generator" aria-labelledby="luo">
-	<h1 id="luo" class="visually-hidden">Luo salasanoja</h1>
-
+<section class="generator" aria-label="Salasanageneraattori">
 	<div class="modes" role="radiogroup" aria-label="Salasanan tyyppi">
 		<button type="button" class="mode is-active" data-mode="words" role="radio" aria-checked="true">Sanoja</button>
 		<button type="button" class="mode" data-mode="string" role="radio" aria-checked="false">Merkkijono</button>
@@ -89,14 +111,65 @@
 		toimii yhtä hyvin ilman verkkoa, kunhan sanalista on kerran ladattu.
 	</p>
 
-	<h2 id="miksi-sanoja">Miksi sanoja eikä sekamerkkejä?</h2>
+	<h2 id="miksi-arpoa">Miksi salasana kannattaa arpoa</h2>
+	<p>
+		Ihminen on huono keksimään satunnaista. Kun salasana pitää itse kehittää, siihen päätyy
+		lähes aina jotain omaa: lapsen nimi, syntymävuosi, lempijoukkue, työpaikan nimi ja
+		perään huutomerkki. Se tuntuu omalta ja siksi turvalliselta – mutta juuri sitä
+		hyökkääjä arvaa ensimmäisenä.
+	</p>
+	<p>
+		Salasanoja ei nykyään murreta kokeilemalla kirjautumista uudestaan ja uudestaan.
+		Hyökkääjä saa käsiinsä jonkin palvelun vuotaneen tunnustietokannan ja kokeilee sitä
+		omalla koneellaan, miljoonia arvauksia sekunnissa. Ensin käydään läpi kaikki aiemmin
+		vuotaneet salasanat, sitten sanakirjat, sitten tutut kikat: <em>a</em> vaihtuu
+		nelosiksi, <em>o</em> nollaksi, loppuun <em>!</em> tai <em>123</em>. Ne on kaikki
+		nähty. <strong>Kissa2019!</strong> ei ole vahva salasana, vaikka siinä on iso kirjain,
+		numero ja erikoismerkki.
+	</p>
+	<p>
+		Kone taas ei osaa arvata satunnaista sen paremmin kuin sinäkään. Kun salasana on
+		arvottu oikeasti satunnaisesti, ainoa keino murtaa se on kokeilla kaikkia
+		vaihtoehtoja järjestyksessä – ja kun vaihtoehtoja on tarpeeksi, aikaa kuluu enemmän
+		kuin maailmankaikkeus on ollut olemassa. Siksi tämä sivu arpoo puolestasi.
+	</p>
+	<p>
+		Yhtä tärkeää on, ettei samaa salasanaa käytä kahdessa paikassa. Yksi vuoto riittää
+		avaamaan kaikki ne palvelut, joissa sama salasana on käytössä – tätä kokeillaan
+		automaattisesti heti, kun uusi vuoto ilmestyy. Jokaiseen palveluun oma salasana on
+		tärkeämpää kuin yhdenkään salasanan pituus.
+	</p>
+
+	<h2 id="miksi-sanoja">Miksi sanat ovat parempia kuin sekamerkit</h2>
 	<p>
 		<strong>rakenne-Ovela-tuuli-mätäs</strong> on helpompi lukea, sanella puhelimessa ja
-		naputella puhelimen näppäimistöllä kuin <strong>x7Qp!2vZ</strong> – ja silti selvästi
-		vahvempi. Vahvuus tulee sanojen määrästä, ei kikkailusta: kahdeksan satunnaista sanaa
-		suomen kielen sanalistasta on noin
-		<strong>124 bittiä</strong> entropiaa. Se on enemmän kuin mikään nykyinen tai
-		lähitulevaisuuden tietokone pystyy arvaamaan.
+		naputella kuin <strong>x7Qp!2vZ</strong> – ja silti moninkertaisesti vahvempi.
+		Tässä on kaksi eri asiaa, jotka menevät usein sekaisin.
+	</p>
+	<p>
+		<strong>Muistamisen kannalta</strong> pituus on ilmaista, kun se koostuu sanoista.
+		Aivot muistavat merkityksiä, eivät merkkijonoja. Neljä sanaa on neljä asiaa
+		muistettavaksi, vaikka merkkejä on parikymmentä; <em>x7Qp!2vZ</em> on kahdeksan
+		toisiinsa liittymätöntä merkkiä, eli kahdeksan erillistä asiaa – ja silti lyhyempi.
+		Sanoista koostuvan salasanan voi myös lukea ääneen puhelimessa tai kopioida
+		virheettömästi paperilta, mikä sekamerkkijonolla on tuskaa.
+	</p>
+	<p>
+		<strong>Vahvuuden kannalta</strong> ratkaisee se, kuinka monesta vaihtoehdosta kukin
+		palanen on arvottu. Yksi merkki sekamerkkijonossa on arvottu noin 60 vaihtoehdosta.
+		Yksi sana tämän sivun listasta on arvottu <strong>22&nbsp;852</strong> vaihtoehdosta,
+		eli yksi sana vastaa noin kahta ja puolta satunnaista merkkiä – ja on silti yksi
+		muistettava asia. Kahdeksan sanan salasanalle vaihtoehtoja on noin
+		19&nbsp;000&nbsp;000&nbsp;000&nbsp;000&nbsp;000&nbsp;000&nbsp;000&nbsp;000&nbsp;000&nbsp;000&nbsp;000
+		kappaletta. Vaikka murtokone kokeilisi tuhat miljardia arvausta sekunnissa, kaikkien
+		läpikäymiseen menisi kymmeniä miljoonia kertoja kauemmin kuin maailmankaikkeus on
+		ollut olemassa.
+	</p>
+	<p>
+		Tärkeä ehto: <em>sanojen pitää olla arvottuja, ei itse valittuja</em>. Itse keksitty
+		lause omista kirjoistasi ja harrastuksistasi ei ole satunnainen, ja tunnetut
+		sitaatit ja sanonnat ovat hyökkääjän sanakirjoissa siinä missä yksittäiset sanatkin.
+		Vahvuus on siinä, että kone arpoi – ei siinä, että sanoja on monta.
 	</p>
 	<p>
 		Sanalista on suomen kielen yleissanastoa, joten mukana on ä- ja ö-kirjaimia. Ne ovat osa
@@ -122,6 +195,57 @@
 		vahvaa salausavainta. Alle 60 bitin salasanoja ei kannata käyttää mihinkään tärkeään.
 	</p>
 
+	<h2 id="salasanojen-hallinta">Kannattaako salasanojen hallintaohjelma?</h2>
+	<p>
+		Kyllä. Tämä on asia, josta tietoturva-alalla vallitsee poikkeuksellisen laaja
+		yksimielisyys: hallintaohjelman käyttöönotto on useimmille ihmisille se yksittäinen
+		muutos, joka parantaa turvallisuutta eniten.
+	</p>
+	<p>
+		Syy on yksinkertainen. Kukaan ei muista sataa eri satunnaista salasanaa, joten ilman
+		apuvälinettä salasanoja väistämättä kierrätetään tai keksitään saman kaavan mukaan –
+		ja juuri se on se ongelma, joka oikeasti kaataa tilejä. Hallintaohjelma arpoo
+		jokaiseen palveluun oman salasanansa ja muistaa ne puolestasi. Sinun tarvitsee
+		muistaa vain yksi: <strong>pääsalasana</strong>, jolla holvi avataan.
+	</p>
+	<p>
+		Juuri siihen pääsalasanaan tämä sivu on omimmillaan. Sen pitää olla vahva, sitä ei voi
+		tallentaa mihinkään, ja se pitää muistaa ulkoa vuosia – eli täsmälleen se tilanne,
+		jossa arvotut sanat päihittävät sekamerkit selvästi. Sama koskee laitteen avauskoodia
+		ja sähköpostitilin salasanaa: nämä kolme kannattaa opetella, loput kuuluvat ohjelmalle.
+	</p>
+	<p>
+		<strong>Entä jos hallintaohjelmaan murtaudutaan?</strong> Näin on käynyt, ja
+		salasanaholveja on päätynyt vääriin käsiin. Opetus ei kuitenkaan ole se, että holvit
+		olisivat huono ajatus, vaan se, mikä ratkaisee varastetun holvin kohtalon: holvi on
+		salattu pääsalasanallasi. Jos pääsalasana on arvottu ja pitkä, varastettu holvi on
+		hyökkääjälle pelkkää kohinaa. Jos se on <em>Kissa2019!</em>, holvi aukeaa. Riski, että
+		käytät samaa salasanaa kahdessa paikassa, on käytännössä paljon suurempi kuin riski,
+		että hallintaohjelmasi vuotaa.
+	</p>
+	<p>
+		<strong>Minkä ohjelman valitsisin?</strong> Selaimeen ja puhelimeen sisäänrakennettu
+		salasanojen tallennus (Applen, Googlen tai Mozillan) on ilmainen, riittävä useimmille
+		ja joka tapauksessa parempi kuin salasanojen kierrättäminen. Erillinen ohjelma –
+		esimerkiksi avoimen lähdekoodin <a href="https://bitwarden.com/">Bitwarden</a> tai
+		täysin paikallinen <a href="https://keepassxc.org/">KeePassXC</a> – antaa enemmän
+		hallintaa ja toimii kaikissa selaimissa. Tärkeintä on, että otat jonkin niistä
+		käyttöön; paras on se, jota oikeasti käytät.
+	</p>
+	<p>
+		Kaksi asiaa vielä. Ota käyttöön <strong>kaksivaiheinen tunnistautuminen</strong>
+		kaikkialla, missä se on tarjolla – se suojaa silloinkin, kun salasana on jo vuotanut.
+		Ja jos palvelu tarjoaa <strong>passkey-avainta</strong>, käytä sitä: silloin
+		salasanaa ei ole olemassa, joten sitä ei voi vuotaa eikä kalastella.
+	</p>
+	<p class="note">
+		Salasanoja ei kannata säilyttää salaamattomassa muistiinpanosovelluksessa, sähköpostin
+		luonnoksissa eikä tekstitiedostona pilvilevyllä. Sen sijaan lapulle kirjoitettu ja
+		kotona laatikossa säilytettävä pääsalasana ei ole tyhmä ratkaisu: se suojaa juuri
+		siltä hyökkääjältä, joka on realistinen – verkon toiselta puolelta tulevalta. Älä vain
+		pidä lappua lompakossa.
+	</p>
+
 	<h2 id="komentorivi">Sama työkalu komentoriville</h2>
 	<p>
 		Sivun takana on <code>generate-passwd</code>, pieni Python-komentorivityökalu, joka
@@ -145,21 +269,48 @@ generate-passwd --string --length 16   # 16 merkin merkkijono</code></pre>
 	</p>
 	<p>
 		Voit ladata listat sellaisenaan:
-		<a href="/wordlist-fi.txt" download>wordlist-fi.txt</a> ja
-		<a href="/wordlist-en.txt" download>wordlist-en.txt</a>.
+	</p>
+	<ul class="links">
+		<li><a href="/wordlist-fi.txt" download>wordlist-fi.txt – suomi</a></li>
+		<li><a href="/wordlist-en.txt" download>wordlist-en.txt – englanti</a></li>
+	</ul>
+
+	<h2 id="yhteiseksi-hyvaksi">Ilmainen ja yhteiseksi hyväksi</h2>
+	<p>
+		Tämä palvelu on maksuton ja tarkoitettu kaikkien käyttöön. Ei tunnusta, ei tilausta,
+		ei mainoksia, ei maksumuuria eikä myöhemmin yllättävää maksullista versiota. Vahva
+		salasana on nykyään perustaito, ja sen apuvälineen kuuluu olla kaikkien ulottuvilla.
+	</p>
+	<p>
+		Sivun ja komentorivityökalun lähdekoodi on avointa (GNU LGPL), joten kuka tahansa voi
+		lukea mitä se tekee, tarkistaa väitteet itse, kopioida sen ja pystyttää oman
+		versionsa. Turvallisuustyökalua ei kannata uskoa pelkän lupauksen varassa – sitä
+		pitää voida tarkistaa. Palvelun ylläpidosta vastaa
+		<a href="https://www.vapaaradikaali.fi">Vapaaradikaali</a>. Mitä sivu kerää ja mitä
+		ei, on kerrottu <a href="/tietosuoja">tietosuojaselosteessa</a>.
 	</p>
 </section>
 
 </main>
 
 <footer class="site-footer">
-	<p>
-		<a href="https://github.com/adrenalin/generate-passwd">Lähdekoodi GitHubissa</a> ·
-		GNU LGPL v3 tai uudempi ·
-		sanasto © <a href="https://kaino.kotus.fi/sanat/nykysuomi/">Kotimaisten kielten keskus</a>
-	</p>
+	<div class="footer-inner">
+		<p>
+			<a href="https://github.com/adrenalin/generate-passwd">Lähdekoodi GitHubissa</a> ·
+			GNU LGPL v3 tai uudempi
+		</p>
+		<p class="fine">
+			Palvelun tarjoaa <a href="https://www.vapaaradikaali.fi">Vapaaradikaali</a>, Y-tunnus 2302852-4.
+			<a href="/tietosuoja">Tietosuojaseloste</a>.
+		</p>
+		<p class="fine">
+			Sanasto © <a href="https://kaino.kotus.fi/sanat/nykysuomi/">Kotimaisten kielten keskus</a> (GNU LGPL) ·
+			kirjasintyyppi Source Sans 3 © Adobe (SIL OFL 1.1)
+		</p>
+	</div>
 </footer>
 
 <script src="/app.js"></script>
+<script src="/analytics.js" defer></script>
 </body>
 </html>

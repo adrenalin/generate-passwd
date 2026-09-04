@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tietosuojaseloste – salasanasi.fi</title>
+<meta name="description" content="Mitä salasanasi.fi kerää ja mitä ei: salasanat eivät poistu selaimestasi, kävijämittaus on evästeetöntä ja IP-osoitteet peitetään.">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#2a6ebb">
+<link rel="canonical" href="https://www.salasanasi.fi/tietosuoja">
+<link rel="preload" href="/fonts/source-sans-3-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/source-sans-3-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/style.css">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+
+<header class="site-header">
+	<div class="bar">
+		<a class="wordmark" href="/">
+			<svg class="mark" viewBox="0 0 32 32" width="32" height="32" aria-hidden="true" focusable="false">
+				<rect width="32" height="32" rx="2" fill="#00357a"/>
+				<path d="M11 14v-3a5 5 0 0 1 10 0v3" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
+				<rect x="8" y="14" width="16" height="12" rx="1.5" fill="#fff"/>
+				<circle cx="12.5" cy="20" r="1.5" fill="#00357a"/>
+				<circle cx="16" cy="20" r="1.5" fill="#00357a"/>
+				<circle cx="19.5" cy="20" r="1.5" fill="#00357a"/>
+			</svg>
+			<span class="name">salasanasi<span class="tld">.fi</span></span>
+		</a>
+	</div>
+</header>
+
+<div class="hero">
+	<div class="hero-inner">
+		<h1 class="hero-title">Tietosuojaseloste</h1>
+		<p class="hero-lead">
+			Lyhyesti: salasanasi eivät poistu selaimestasi, emmekä tallenna sinusta mitään,
+			mistä sinut voisi tunnistaa.
+		</p>
+	</div>
+</div>
+
+<main>
+
+<section class="prose">
+	<h2 id="rekisterinpitaja">Rekisterinpitäjä</h2>
+	<p>
+		<a href="https://www.vapaaradikaali.fi">Vapaaradikaali</a>, Y-tunnus 2302852-4.
+		Tietosuoja-asioissa voit ottaa yhteyttä yhtiön verkkosivuilla kerrotulla tavalla.
+	</p>
+
+	<h2 id="salasanat">Salasanoja ei lähetetä eikä tallenneta</h2>
+	<p>
+		Tämä on selosteen tärkein kohta. Salasanat arvotaan kokonaan selaimessasi
+		<code>crypto.getRandomValues()</code>-funktiolla. Ne eivät kulje verkon yli, eivät
+		päädy palvelimen lokeihin eikä niitä tallenneta mihinkään – ei palvelimelle eikä
+		selaimeen. Palvelin lähettää sinulle vain sivun, sanalistan ja kirjasintiedostot,
+		eikä se voi tietää, mitä koneellasi niistä syntyy.
+	</p>
+	<p>
+		Myöskään valintasi – kieli, sanojen määrä, erotin – eivät lähde koneeltasi.
+		Ne vaikuttavat vain siihen, mitä selain laskee.
+	</p>
+
+	<h2 id="kavijamittaus">Kävijämittaus</h2>
+	<p>
+		Sivustolla on kävijämittaus, jotta tiedämme karkeasti kuinka montaa ihmistä palvelu
+		hyödyttää. Käytössä on <a href="https://matomo.org/">Matomo</a>, jota ylläpidämme
+		itse omalla palvelimellamme. Mittausdataa ei luovuteta kolmansille osapuolille eikä
+		käytetä mainontaan.
+	</p>
+	<p>Mittaus on rajattu niin, että siitä ei muodostu henkilötietoa:</p>
+	<ul class="facts">
+		<li>
+			<strong>IP-osoite peitetään.</strong> Matomo nollaa osoitteen kaksi viimeistä
+			tavua ennen tallennusta, eli osoitteesta <code>203.0.113.42</code> tallentuu
+			<code>203.0.0.0</code>. Täydellistä IP-osoitetta ei kirjoiteta levylle missään
+			vaiheessa.
+		</li>
+		<li>
+			<strong>Ei evästeitä.</strong> Mittaus on pakotettu evästeettömäksi sekä
+			selaimen puolella että palvelimella. Sivusto ei aseta yhtään evästettä, joten
+			evästekyselyä ei tarvita.
+		</li>
+		<li>
+			<strong>Ei ulkopuolisia palvelimia.</strong> Mittauspyynnöt kulkevat tämän saman
+			osoitteen kautta (<code>/stats/</code>), joten selaimesi ei ota yhteyttä
+			yhteenkään muuhun sivustoon. Sivulla ei ole mainoksia, upotuksia eikä
+			ulkopuolisia skriptejä lainkaan.
+		</li>
+		<li>
+			<strong>Ei ristiinseurantaa.</strong> Emme yhdistä käyntejäsi muihin palveluihin
+			emmekä toisiin sivustoihin. Emme muodosta profiilia emmekä tee automaattista
+			päätöksentekoa.
+		</li>
+		<li>
+			<strong>Seurantakielto huomioidaan.</strong> Jos selaimesi lähettää
+			<em>Do&nbsp;Not&nbsp;Track</em>- tai <em>Global Privacy Control</em> -pyynnön,
+			mittausta ei käynnistetä lainkaan ja palvelin hylkää mahdollisen mittaustiedon
+			joka tapauksessa.
+		</li>
+		<li>
+			<strong>Viittaustiedoista poistetaan kyselyparametrit.</strong> Näemme mistä
+			sivustolta saavuit, emme sitä mitä hakusanaa tai tunnistetta osoitteessa oli.
+		</li>
+	</ul>
+	<p>
+		Käytännössä mittaukseen tallentuu: käyty sivu, ajankohta, peitetystä IP-osoitteesta
+		päätelty karkea sijainti (maa ja usein kaupunki), selaimen ja käyttöjärjestelmän
+		tyyppi, näytön koko sekä viittaava sivusto ilman kyselyparametreja. Näistä ei voi
+		yksilöidä sinua.
+	</p>
+
+	<h2 id="lokit">Palvelinlokit</h2>
+	<p>
+		Verkkopalvelin kirjaa pyynnöt vianselvitystä varten. Myös näissä lokeissa
+		IP-osoitteesta tallennetaan vain kaksi ensimmäistä tavua, eli tarkkaa osoitetta ei
+		säilytetä missään.
+	</p>
+
+	<h2 id="peruste">Käsittelyn peruste ja säilytys</h2>
+	<p>
+		Käsittelyn perusteena on oikeutettu etu (EU:n yleisen tietosuoja-asetuksen 6 artiklan
+		1&nbsp;kohdan f alakohta): palvelun toiminnan seuraaminen ja kehittäminen. Koska
+		tiedot on anonymisoitu edellä kuvatulla tavalla, niistä ei muodostu
+		henkilörekisteriä. Anonymisoituja tilastotietoja säilytetään toistaiseksi.
+	</p>
+	<p>
+		Emme kerää nimiä, sähköpostiosoitteita, tunnuksia emmekä maksutietoja. Palvelussa ei
+		ole kirjautumista eikä lomakkeita.
+	</p>
+
+	<h2 id="oikeudet">Oikeutesi</h2>
+	<p>
+		Tietosuoja-asetuksen mukaiset oikeudet – tarkastusoikeus, oikaisu, poisto,
+		käsittelyn rajoittaminen ja vastustaminen – koskevat henkilötietoja. Koska emme
+		tallenna sinusta tunnistettavia tietoja, emme pysty yhdistämään mitään tallennettua
+		tietoa sinuun emmekä siksi voi hakea tai poistaa niitä pyynnöstä. Voit halutessasi
+		estää mittauksen kokonaan kytkemällä selaimesi seurannanestoasetuksen päälle.
+	</p>
+	<p>
+		Jos katsot, että henkilötietojasi on käsitelty tietosuojalainsäädännön vastaisesti,
+		voit tehdä valituksen
+		<a href="https://tietosuoja.fi/">tietosuojavaltuutetun toimistolle</a>.
+	</p>
+
+	<h2 id="muutokset">Muutokset</h2>
+	<p>
+		Jos selosteen sisältö muuttuu, muutos näkyy sivuston
+		<a href="https://github.com/adrenalin/generate-passwd">julkisessa lähdekoodissa</a>
+		versiohistoriana. Seloste on päivitetty 4.9.2026.
+	</p>
+</section>
+
+</main>
+
+<footer class="site-footer">
+	<div class="footer-inner">
+		<p>
+			<a href="/">Takaisin salasanageneraattoriin</a> ·
+			<a href="https://github.com/adrenalin/generate-passwd">Lähdekoodi GitHubissa</a> ·
+			GNU LGPL v3 tai uudempi
+		</p>
+		<p class="fine">
+			Palvelun tarjoaa <a href="https://www.vapaaradikaali.fi">Vapaaradikaali</a>, Y-tunnus 2302852-4.
+		</p>
+	</div>
+</footer>
+
+<script src="/analytics.js" defer></script>
+</body>
+</html>

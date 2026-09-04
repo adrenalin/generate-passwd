@@ -6,7 +6,7 @@
 server {
 	listen 80;
 	listen [::]:80;
-	server_name salasanasi.fi www.salasanasi.fi;
+	server_name www.salasanasi.fi salasanasi.fi;
 	root /var/www/salasanasi.fi;
 	index index.html;
 	charset utf-8;

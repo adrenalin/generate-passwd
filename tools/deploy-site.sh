@@ -22,7 +22,7 @@ cd "$(dirname "$0")/.."
 echo "==> staging $SITE"
 STAGE=$(mktemp -d)
 trap 'rm -rf "$STAGE"' EXIT
-cp web/index.html web/style.css web/app.js web/favicon.svg web/robots.txt "$STAGE/"
+cp -R web/. "$STAGE/"
 cp wordlist-fi.txt wordlist-en.txt "$STAGE/"
 
 echo "==> copying to $HOST:$WEBROOT"
@@ -32,12 +32,18 @@ rsync -rlt --delete --chmod=D755,F644 --exclude '.well-known' \
 	"$STAGE/" "$HOST:$WEBROOT/"
 
 echo "==> installing nginx site"
-scp -q "deploy/$SITE.nginx" "deploy/$SITE.bootstrap.nginx" "$HOST:/tmp/"
+scp -q "deploy/$SITE.nginx" "deploy/$SITE.bootstrap.nginx" \
+	deploy/salasanasi-shared.conf deploy/salasanasi-matomo-proxy.conf "$HOST:/tmp/"
 ssh "$HOST" "set -eu
 	site=$SITE
 	webroot=$WEBROOT
 	sudo install -d -m 755 /var/log/nginx/accesslogs
 	sudo chown -R www-data:www-data \"\$webroot\"
+
+	# http-tason vyöhykkeet ja mittausproxyn otsakkeet ensin: vhost viittaa niihin,
+	# joten väärässä järjestyksessä nginx -t kaatuisi.
+	sudo install -o root -g root -m 644 /tmp/salasanasi-shared.conf /etc/nginx/conf.d/salasanasi-shared.conf
+	sudo install -o root -g root -m 644 /tmp/salasanasi-matomo-proxy.conf /etc/nginx/snippets/salasanasi-matomo-proxy.conf
 
 	install_conf() {
 		sudo install -o root -g root -m 644 \"/tmp/\$1\" \"/etc/nginx/sites-available/\$site\"
@@ -46,7 +52,10 @@ ssh "$HOST" "set -eu
 		sudo systemctl reload nginx
 	}
 
-	if [ ! -d \"/etc/letsencrypt/live/\$site\" ]; then
+	# sudo test: /etc/letsencrypt/live on 0700 rootille, joten tavallinen käyttäjä ei
+	# näe hakemistoa ja tarkistus luulisi varmennetta puuttuvaksi joka ajolla — mikä
+	# pudottaisi HTTPS:n bootstrap-konfiguraation ajaksi jokaisessa julkaisussa.
+	if ! sudo test -d \"/etc/letsencrypt/live/\$site\"; then
 		echo '--> no certificate yet, bootstrapping over HTTP'
 		install_conf \"\$site.bootstrap.nginx\"
 		sudo certbot certonly --webroot -w \"\$webroot\" \\
@@ -55,6 +64,7 @@ ssh "$HOST" "set -eu
 	fi
 
 	install_conf \"\$site.nginx\"
-	rm -f \"/tmp/\$site.nginx\" \"/tmp/\$site.bootstrap.nginx\""
+	rm -f \"/tmp/\$site.nginx\" \"/tmp/\$site.bootstrap.nginx\" \
+		/tmp/salasanasi-shared.conf /tmp/salasanasi-matomo-proxy.conf"
 
-echo "==> done: https://$SITE/"
+echo "==> done: https://www.$SITE/"

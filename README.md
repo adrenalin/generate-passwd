@@ -115,7 +115,14 @@ It draws from the same two wordlists and does everything in the browser with
 `crypto.getRandomValues()` — nothing is sent to the server, and the page loads
 no third-party resources at all (enforced by a `default-src 'none'` CSP).
 
-The source is in `web/`, the nginx site in `deploy/`. To publish:
+The source is in `web/`, the nginx site in `deploy/`. There is a Finnish privacy
+policy at `/tietosuoja`, and anonymous visitor measurement through a self-hosted
+Matomo: `/stats/matomo.js` and `/stats/matomo.php` are reverse-proxied to
+openmat.fi so the browser only ever talks to this origin. Tracking is cookieless,
+IP addresses are masked to their first two bytes (in Matomo *and* in the nginx
+access log), and DNT/GPC suppress it entirely.
+
+To publish:
 
 ```sh
 ./tools/deploy-site.sh              # host defaults to kaktus.cc

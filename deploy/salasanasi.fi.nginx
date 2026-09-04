@@ -15,8 +15,25 @@ server {
 	}
 
 	location / {
-		return 301 https://salasanasi.fi$request_uri;
+		return 301 https://www.salasanasi.fi$request_uri;
 	}
+}
+
+# Ilman www:tä tuleva liikenne ohjataan kanoniseen osoitteeseen.
+server {
+	listen 443 ssl;
+	listen [::]:443 ssl;
+	http2 on;
+	server_name salasanasi.fi;
+
+	ssl_certificate /etc/letsencrypt/live/salasanasi.fi/fullchain.pem;
+	ssl_certificate_key /etc/letsencrypt/live/salasanasi.fi/privkey.pem;
+	include /etc/letsencrypt/options-ssl-nginx.conf;
+	ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+	add_header Strict-Transport-Security "max-age=63072000" always;
+
+	return 301 https://www.salasanasi.fi$request_uri;
 }
 
 server {
@@ -24,25 +41,12 @@ server {
 	listen [::]:443 ssl;
 	http2 on;
 	server_name www.salasanasi.fi;
-
-	ssl_certificate /etc/letsencrypt/live/salasanasi.fi/fullchain.pem;
-	ssl_certificate_key /etc/letsencrypt/live/salasanasi.fi/privkey.pem;
-	include /etc/letsencrypt/options-ssl-nginx.conf;
-	ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
-
-	return 301 https://salasanasi.fi$request_uri;
-}
-
-server {
-	listen 443 ssl;
-	listen [::]:443 ssl;
-	http2 on;
-	server_name salasanasi.fi;
 	root /var/www/salasanasi.fi;
 	index index.html;
 	charset utf-8;
 
-	access_log /var/log/nginx/accesslogs/salasanasi.fi.log;
+	# Anonymisoitu lokimuoto: tarkka IP ei päädy levylle. Katso salasanasi-shared.conf.
+	access_log /var/log/nginx/accesslogs/salasanasi.fi.log sp_anon;
 
 	ssl_certificate /etc/letsencrypt/live/salasanasi.fi/fullchain.pem;
 	ssl_certificate_key /etc/letsencrypt/live/salasanasi.fi/privkey.pem;
@@ -50,7 +54,7 @@ server {
 	ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
 	# Kaikki tapahtuu selaimessa: sivu ei tarvitse yhtään ulkopuolista resurssia.
-	add_header Content-Security-Policy "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'" always;
+	add_header Content-Security-Policy "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'" always;
 	add_header Strict-Transport-Security "max-age=63072000" always;
 	add_header Referrer-Policy "no-referrer" always;
 	add_header X-Content-Type-Options "nosniff" always;
@@ -70,14 +74,76 @@ server {
 		expires 1h;
 	}
 
+	# Kirjasintiedostot ovat muuttumattomia, ne saa pitää pitkään.
+	location ^~ /fonts/ {
+		expires 30d;
+	}
+
 	# Sanalistat ovat isoja ja muuttuvat harvoin.
 	location ~* ^/wordlist-[a-z]+\.txt$ {
 		default_type text/plain;
 		expires 7d;
 	}
 
+	# ── Kävijämittauksen proxy ───────────────────────────────────────
+	# Mittaus ei saa ylittää sivuston rajaa. Matomo on openmat.fi:llä, ja tavallinen
+	# seurantapätkä hakisi skriptin sieltä ja raportoisi sinne suoraan selaimesta —
+	# jolloin toinen origin saisi kävijän IP-osoitteen, selaintiedot ja viittaajan
+	# joka sivulatauksella. Kun molemmat päätepisteet tarjoillaan tästä osoitteesta,
+	# selain puhuu vain tälle sivustolle ja mittaustieto kulkee palvelinten välillä.
+	#
+	# Vain nämä kaksi keräyspäätepistettä välitetään. Matomon raportointikäyttöliittymä
+	# ei ole täällä lainkaan. Kumpikin on tarkka (=) osuma, joka voittaa alla olevan
+	# /stats/-etuliitteen, joten mikään muu ei ole saavutettavissa.
+	#
+	# ⚠️ KÄVIJÄN IP: ketju on kaksihyppyinen (selain → tämä → openmatin nginx → Matomo).
+	# openmatin Matomossa on proxy_client_headers[] = "HTTP_X_FORWARDED_FOR" ja tämän
+	# koneen osoite proxy_ips[]-listalla, joten se lukee kävijän oikean osoitteen ja
+	# anonymisoi sen itse. Ilman X-Forwarded-For -otsaketta jokainen käynti kirjautuisi
+	# tämän palvelimen osoitteesta, mikä pilaisi sekä paikkatiedon että kävijöiden
+	# erottelun (evästeettömänä Matomon varatunniste tiivistää IP:n).
+	location = /stats/matomo.js {
+		limit_req zone=sp_stats burst=20 nodelay;
+
+		proxy_pass https://sp_matomo/stats/matomo.js;
+		include snippets/salasanasi-matomo-proxy.conf;
+
+		# Yksi haku viikossa kävijää kohden sijaan, ja stale-asetuksen ansiosta mittaus
+		# kestää openmat.fi:n katkon yli sen sijaan, että jokainen sivulataus 502:isi.
+		proxy_cache sp_matomo;
+		proxy_cache_valid 200 7d;
+		proxy_cache_valid 404 500 502 503 504 30s;
+		proxy_cache_use_stale error timeout updating http_500 http_502 http_503 http_504;
+		proxy_cache_lock on;
+		proxy_ignore_headers Cache-Control Expires;
+
+		# expires eikä add_header, jotta server-tason turvaotsakkeet periytyvät tänne.
+		proxy_hide_header Cache-Control;
+		proxy_hide_header Expires;
+		expires 1d;
+	}
+
+	location = /stats/matomo.php {
+		limit_req zone=sp_stats burst=20 nodelay;
+
+		proxy_pass https://sp_matomo/stats/matomo.php;
+		include snippets/salasanasi-matomo-proxy.conf;
+
+		# Kävijän kannalta majakka on lähetä-ja-unohda. Lyhyet aikakatkaisut, jotta hidas
+		# tai jumittunut Matomo maksaa yhden mittauspisteen eikä koskaan sivulatausta.
+		proxy_connect_timeout 5s;
+		proxy_send_timeout    10s;
+		proxy_read_timeout    10s;
+	}
+
+	# Kaikki muu /stats/-polun alta — kirjautuminen, raportointi, HTTP-API — jää
+	# tarkoituksella välittämättä. 404 eikä 403, jottei tämä osoite kerro takanaan
+	# olevan mittausjärjestelmää lainkaan.
+	location /stats/ { return 404; }
+
+	# $uri.html tarjoilee siistit osoitteet, esimerkiksi /tietosuoja.
 	location / {
-		try_files $uri $uri/ =404;
+		try_files $uri $uri.html $uri/ =404;
 	}
 
 	location ~ /\. {
