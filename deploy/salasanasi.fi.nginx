@@ -74,6 +74,11 @@ server {
 		expires 1h;
 	}
 
+	# Jakokuva (OpenGraph) muuttuu harvoin ja sitä hakevat lähinnä robotit.
+	location ~* \.(jpg|png|ico)$ {
+		expires 7d;
+	}
+
 	# Kirjasintiedostot ovat muuttumattomia, ne saa pitää pitkään.
 	location ^~ /fonts/ {
 		expires 30d;

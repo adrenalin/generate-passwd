@@ -122,6 +122,10 @@ openmat.fi so the browser only ever talks to this origin. Tracking is cookieless
 IP addresses are masked to their first two bytes (in Matomo *and* in the nginx
 access log), and DNT/GPC suppress it entirely.
 
+Every page must appear in `web/sitemap.xml` — `tools/deploy-site.sh` reads each
+page's own `<link rel="canonical">` and refuses to deploy if one is missing from
+the sitemap, so a new page cannot ship unlisted.
+
 To publish:
 
 ```sh

@@ -110,7 +110,10 @@ input:focus-visible {
 /* ---- sinipalkki ---- */
 
 .hero {
+	/* Sama liukuväri kuin jakokuvassa salasanasi.fi.jpg: tummasta brändisinisestä
+	   vasemmalla vaaleampaan korostussiniseen oikealla. */
 	background: var(--highlight);
+	background: linear-gradient(to right, var(--brand) 0%, var(--highlight) 100%);
 	color: var(--white);
 	padding-inline: 1.5rem;
 }

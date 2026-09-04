@@ -19,6 +19,28 @@ WEBROOT="/var/www/$SITE"
 
 cd "$(dirname "$0")/.."
 
+# Every page must be listed in the sitemap. The canonical URL comes from the page
+# itself, so this catches both a page missing from the sitemap and a page with no
+# canonical link at all.
+echo "==> checking sitemap covers every page"
+missing=0
+for page in web/*.html; do
+	url=$(sed -n 's|.*<link rel="canonical" href="\([^"]*\)".*|\1|p' "$page" | head -1)
+	if [ -z "$url" ]; then
+		echo "  $page has no <link rel=\"canonical\">" >&2
+		missing=1
+		continue
+	fi
+	if ! grep -qF "<loc>$url</loc>" web/sitemap.xml; then
+		echo "  $url ($page) is not in web/sitemap.xml" >&2
+		missing=1
+	fi
+done
+if [ "$missing" -ne 0 ]; then
+	echo "Every page belongs in web/sitemap.xml. Add it, then deploy again." >&2
+	exit 1
+fi
+
 echo "==> staging $SITE"
 STAGE=$(mktemp -d)
 trap 'rm -rf "$STAGE"' EXIT
