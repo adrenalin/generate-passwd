@@ -41,6 +41,7 @@ location, so any prefix works.
 | `-l`, `--length N` | `32` | Password length in characters (string mode only) |
 | `-m`, `--mixed-case` / `--no-mixed-case` | on | Mix lowercase and uppercase |
 | `-s`, `--string` | off | Generate a random character string |
+| `-S`, `--symbols` / `--no-symbols` | off | Add punctuation `!#$%&()*+,-./:;<=>?@[]^_{\|}~` (string mode only) |
 | `-w`, `--words` | default mode | Generate words; ignored when `--string` is given |
 | `--language CODE` | `fi` | Which wordlist to draw from: `fi` or `en` (word mode only) |
 | `--word-separator CHAR` | `-` | What to put between the words |
@@ -52,8 +53,12 @@ location, so any prefix works.
 
 In word mode `--mixed-case` capitalises each word independently at random, so
 the capitalisation pattern itself carries a bit of entropy rather than being a
-fixed Title-Case shape. In string mode the alphabet is `a-z0-9`, plus `A-Z`
-when `--mixed-case` is on.
+fixed Title-Case shape. In string mode the alphabet is `a-z0-9`, plus `A-Z` when `--mixed-case` is on and
+the punctuation above when `--symbols` is on. A string is redrawn if it happens to
+contain no character from one of the enabled classes — uniform draws leave a class
+out often enough at short lengths to trip a "must contain a number" form, and
+rejecting those keeps the result uniform over the strings that do satisfy the rule.
+Below one character per class the rule is unsatisfiable and is skipped.
 
 Finnish passwords contain `ä` and `ö`. That is deliberate — it is what makes
 them Finnish — but a few systems still reject non-ASCII in a password field.
@@ -68,6 +73,7 @@ Use `--language en` or `--string` for those.
 | `generate-passwd --language en` (8 English words, mixed case) | ~129 bits |
 | `generate-passwd --language en --no-mixed-case` | ~121 bits |
 | `generate-passwd -s` (32 chars, mixed case) | ~191 bits |
+| `generate-passwd -s --symbols` | ~208 bits |
 | `generate-passwd -s --no-mixed-case` | ~165 bits |
 
 Per word: 14.5 bits from `wordlist-fi.txt` (22,852 words) or 15.1 bits from

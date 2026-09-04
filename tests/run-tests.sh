@@ -43,6 +43,13 @@ check "--string default length is 32"    sh -c '[ "$($0 -s -q 1 | wc -c)" -eq 33
 check "--string --length"                sh -c '[ "$($0 -s -l 12 -q 1 | wc -c)" -eq 13 ]' "$CMD"
 check "--string --no-mixed-case"         sh -c '$0 -s --no-mixed-case -l 200 -q 5 | grep -qv "[[:upper:]]"' "$CMD"
 check "--string overrides --words"       sh -c '$0 -s -w -q 1 | grep -qv -- "-"' "$CMD"
+check "no symbols by default"            sh -c '$0 -s -l 200 -q 5 | grep -qv "[^A-Za-z0-9]"' "$CMD"
+check "--symbols adds punctuation"       sh -c '$0 -s --symbols -q 5 | grep -q "[^A-Za-z0-9]"' "$CMD"
+check "-S is --symbols"                  sh -c '$0 -s -S -q 5 | grep -q "[^A-Za-z0-9]"' "$CMD"
+check "--no-symbols"                     sh -c '$0 -s --no-symbols -l 200 -q 5 | grep -qv "[^A-Za-z0-9]"' "$CMD"
+check "every class appears"              sh -c 'for i in 1 2 3 4 5 6 7 8 9 10; do p=$($0 -s -S -l 4 -q 1); for c in "[a-z]" "[A-Z]" "[0-9]" "[^A-Za-z0-9]"; do echo "$p" | grep -q "$c" || exit 1; done; done' "$CMD"
+check "unsatisfiable rule still returns" sh -c '[ "$($0 -s -S -l 2 -q 3 | wc -l)" -eq 3 ]' "$CMD"
+check "--symbols ignored in word mode"   sh -c '$0 -S -c 3 -q 5 | grep -qv "[^A-Za-zÄÖäö-]"' "$CMD"
 check "--words is accepted"              lines "-w -q 2" 2
 check "passwords differ"                 sh -c '[ "$($0 -q 20 | sort -u | wc -l)" -eq 20 ]' "$CMD"
 

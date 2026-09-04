@@ -148,13 +148,18 @@
 		</div>
 
 		<div class="field">
-			<label for="quantity">Kuinka monta <output for="quantity" id="quantity-out">5</output></label>
+			<label for="quantity">Kuinka monta salasanaa <output for="quantity" id="quantity-out">5</output></label>
 			<input type="range" id="quantity" min="1" max="20" step="1" value="5">
 		</div>
 
 		<div class="field field-check">
 			<input type="checkbox" id="mixed-case" checked>
 			<label for="mixed-case">Isoja ja pieniä kirjaimia</label>
+		</div>
+
+		<div class="field field-check" data-for="string">
+			<input type="checkbox" id="symbols">
+			<label for="symbols">Erikoismerkkejä <span class="hint">!#$%&amp;()*+,-./:;&lt;=&gt;?@[]^_{|}~</span></label>
 		</div>
 	</div>
 
@@ -256,6 +261,7 @@
 			<tr><td>8 suomenkielistä sanaa, pelkkiä pieniä</td><td>~116 bittiä</td></tr>
 			<tr><td>8 englanninkielistä sanaa, isoja ja pieniä</td><td>~129 bittiä</td></tr>
 			<tr><td>32 merkkiä, isoja ja pieniä kirjaimia</td><td>~191 bittiä</td></tr>
+			<tr><td>32 merkkiä, mukana erikoismerkit</td><td>~208 bittiä</td></tr>
 			<tr><td>32 merkkiä, pelkkiä pieniä ja numeroita</td><td>~165 bittiä</td></tr>
 		</tbody>
 	</table>

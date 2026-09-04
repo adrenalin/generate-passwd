@@ -5,8 +5,12 @@
 'use strict';
 
 (function () {
-	var STRING_ALPHABET = 'abcdefghijklmnopqrstuvwxyz0123456789';
+	var LOWERCASE = 'abcdefghijklmnopqrstuvwxyz';
+	var DIGITS = '0123456789';
 	var UPPERCASE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+	// Välimerkit, jotka kestävät komentotulkin, asetustiedostot ja leikepöydän.
+	// Tarkoituksella ilman lainausmerkkejä, kenoviivaa ja välilyöntiä.
+	var SYMBOLS = '!#$%&()*+,-./:;<=>?@[]^_{|}~';
 
 	var el = {
 		modes: document.querySelectorAll('.mode'),
@@ -17,6 +21,7 @@
 		length: document.getElementById('length'),
 		quantity: document.getElementById('quantity'),
 		mixedCase: document.getElementById('mixed-case'),
+		symbols: document.getElementById('symbols'),
 		regenerate: document.getElementById('regenerate'),
 		strength: document.getElementById('strength'),
 		list: document.getElementById('passwords'),
@@ -53,13 +58,35 @@
 
 	/* ---- salasanat ---- */
 
-	function randomString(length, mixedCase) {
-		var alphabet = mixedCase ? STRING_ALPHABET + UPPERCASE : STRING_ALPHABET;
-		var out = '';
-		for (var i = 0; i < length; i++) {
-			out += alphabet.charAt(randomIndex(alphabet.length));
+	// Merkkiluokat, joista merkkijono arvotaan.
+	function stringClasses(mixedCase, symbols) {
+		var classes = [LOWERCASE, DIGITS];
+		if (mixedCase) { classes.push(UPPERCASE); }
+		if (symbols) { classes.push(SYMBOLS); }
+		return classes;
+	}
+
+	// Tasainen arvonta voi jättää jonkin luokan kokonaan pois — lyhyellä salasanalla
+	// jopa usein — ja juuri sen "salasanassa on oltava numero" -lomake hylkää. Siksi
+	// vaillinainen arvonta hylätään ja arvotaan uudestaan, jolloin lopputulos on
+	// edelleen tasajakautunut niiden merkkijonojen joukossa, jotka täyttävät ehdon.
+	// Jos merkkejä on vähemmän kuin luokkia, ehto on mahdoton ja se ohitetaan.
+	function randomString(length, mixedCase, symbols) {
+		var classes = stringClasses(mixedCase, symbols);
+		var alphabet = classes.join('');
+		var requireAll = length >= classes.length;
+
+		for (;;) {
+			var out = '';
+			for (var i = 0; i < length; i++) {
+				out += alphabet.charAt(randomIndex(alphabet.length));
+			}
+			if (!requireAll || classes.every(function (cls) {
+				return out.split('').some(function (ch) { return cls.indexOf(ch) !== -1; });
+			})) {
+				return out;
+			}
 		}
-		return out;
 	}
 
 	function randomWords(words, count, separator, mixedCase) {
@@ -111,7 +138,7 @@
 
 	function entropyBits(wordCount) {
 		if (mode === 'string') {
-			var size = el.mixedCase.checked ? STRING_ALPHABET.length + 26 : STRING_ALPHABET.length;
+			var size = stringClasses(el.mixedCase.checked, el.symbols.checked).join('').length;
 			return Number(el.length.value) * Math.log2(size);
 		}
 		if (!wordCount) {
@@ -217,7 +244,7 @@
 			var length = Number(el.length.value);
 			var out = [];
 			for (var i = 0; i < quantity; i++) {
-				out.push(randomString(length, mixedCase));
+				out.push(randomString(length, mixedCase, el.symbols.checked));
 			}
 			render(out);
 			showStrength(0);

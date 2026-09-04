@@ -231,6 +231,16 @@ main > * {
 }
 .field-check input { width: 1.15rem; height: 1.15rem; accent-color: var(--highlight); margin: 0; flex: none; }
 .field-check label { margin: 0; font-weight: 400; }
+/* Kaksirivisessä valinnassa ruutu kohdistuu ensimmäiseen riviin, ei rivien väliin. */
+.field-check:has(.hint) { align-items: flex-start; }
+.field-check:has(.hint) input { margin-top: 0.25rem; }
+
+.field-check .hint {
+	display: block;
+	font: 0.85rem/1.4 var(--mono);
+	color: var(--ink-soft);
+	word-break: break-all;
+}
 
 .actions {
 	display: flex;

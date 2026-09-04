@@ -26,9 +26,13 @@ import string
 import sys
 from pathlib import Path
 
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 
 PROG = "generate-passwd"
+
+# Punctuation that survives shells, config files and copy-paste. Deliberately without
+# quotes, backtick, backslash and space, which turn a password into a quoting problem.
+SYMBOLS = "!#$%&()*+,-./:;<=>?@[]^_{|}~"
 
 DEFAULT_LENGTH = 32
 DEFAULT_LANGUAGE = "fi"
@@ -111,12 +115,34 @@ def load_words(language):
     )
 
 
-def random_string(length, mixed_case):
-    """A random alphanumeric string of the given length."""
-    alphabet = string.ascii_lowercase + string.digits
+def string_classes(mixed_case, symbols):
+    """The character classes a string password is drawn from."""
+    classes = [string.ascii_lowercase, string.digits]
     if mixed_case:
-        alphabet += string.ascii_uppercase
-    return "".join(rng.choice(alphabet) for _ in range(length))
+        classes.append(string.ascii_uppercase)
+    if symbols:
+        classes.append(SYMBOLS)
+    return classes
+
+
+def random_string(length, mixed_case, symbols):
+    """A random string of the given length, using at least one of every class.
+
+    Drawing uniformly can leave a class out entirely — at length 8 with digits
+    enabled that happens a quarter of the time — and a password with no digit is
+    exactly what a "must contain a number" form rejects. So a draw missing a
+    class is discarded and redrawn, which keeps the result uniform over the
+    strings that do satisfy the rule. Below one character per class the rule is
+    unsatisfiable, so it is skipped.
+    """
+    classes = string_classes(mixed_case, symbols)
+    alphabet = "".join(classes)
+    require_all = length >= len(classes)
+
+    while True:
+        password = "".join(rng.choice(alphabet) for _ in range(length))
+        if not require_all or all(any(c in cls for c in password) for cls in classes):
+            return password
 
 
 def random_words(words, count, separator, mixed_case):
@@ -145,6 +171,11 @@ def parse_args(argv=None):
     parser.add_argument(
         "-s", "--string", action="store_true",
         help="generate a random character string instead of words",
+    )
+    parser.add_argument(
+        "-S", "--symbols", action=argparse.BooleanOptionalAction, default=False,
+        # argparse %-formats help strings, so the % in SYMBOLS has to be doubled.
+        help=f"include punctuation {SYMBOLS.replace('%', '%%')} (string mode only)",
     )
     parser.add_argument(
         "-w", "--words", action="store_true",
@@ -181,7 +212,10 @@ def generate(args):
     if args.string:
         if args.length < 1:
             raise PasswdError("--length must be at least 1")
-        return [random_string(args.length, args.mixed_case) for _ in range(args.quantity)]
+        return [
+            random_string(args.length, args.mixed_case, args.symbols)
+            for _ in range(args.quantity)
+        ]
 
     if args.word_count < 1:
         raise PasswdError("--word-count must be at least 1")
