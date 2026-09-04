@@ -1,5 +1,9 @@
 #!/bin/sh
+# SPDX-License-Identifier: LGPL-3.0-or-later
 # Black-box tests for generate-passwd. Run with `make test`.
+#
+# Copyright (C) 2026 Arttu Manninen.  Licensed under the GNU LGPL v3 or later;
+# see COPYING.LESSER.
 set -eu
 export LC_ALL=C.UTF-8
 

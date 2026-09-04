@@ -1,5 +1,9 @@
 #!/bin/sh
+# SPDX-License-Identifier: LGPL-3.0-or-later
 # Regenerate a wordlist for one language.
+#
+# Copyright (C) 2026 Arttu Manninen.  Licensed under the GNU LGPL v3 or later;
+# see COPYING.LESSER.
 #
 #   ./tools/build-wordlist.sh en [dictionary] > wordlist-en.txt
 #   ./tools/build-wordlist.sh fi [sanalista]  > wordlist-fi.txt

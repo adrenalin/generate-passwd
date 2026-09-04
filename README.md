@@ -99,18 +99,32 @@ Otherwise the script searches, in order: next to itself,
 and `/usr/share/generate-passwd/`, falling back to `/usr/share/dict/words` for
 `--language en`.
 
-### Sources and licences
+### Sources
 
 - `wordlist-en.txt` — derived from `/usr/share/dict/american-english`
   (Debian/Ubuntu `wamerican`, public domain / SCOWL permissive licence).
 - `wordlist-fi.txt` — derived from *Nykysuomen sanalista*, © Kotimaisten
   kielten keskus (Institute for the Languages of Finland), released under the
-  **GNU LGPL**: <https://kaino.kotus.fi/sanat/nykysuomi/>. Retrieved via
-  <https://github.com/hugovk/everyfinnishword>. Redistributing this file, or a
-  build of it, carries the LGPL's attribution requirement.
+  GNU LGPL: <https://kaino.kotus.fi/sanat/nykysuomi/>. Retrieved via
+  <https://github.com/hugovk/everyfinnishword>.
 
 ## Tests
 
 ```sh
 make test
 ```
+
+## Licence
+
+Copyright © 2026 Arttu Manninen. GNU Lesser General Public License, version 3
+or later (`SPDX-License-Identifier: LGPL-3.0-or-later`). The full text is in
+[COPYING.LESSER](COPYING.LESSER), which supplements
+[COPYING](COPYING) (GPL-3.0).
+
+This matches the licence of the bundled Kotus Finnish wordlist, so the
+repository as a whole can be redistributed under the LGPL. Keep the copyright
+notice and the licence files with any copy you pass on.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
