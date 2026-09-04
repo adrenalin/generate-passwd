@@ -13,7 +13,7 @@
 # see COPYING.LESSER.
 set -eu
 
-HOST="${1:-${SALASANASI_HOST:-kaktus.cc}}"
+HOST="${1:-${SALASANASI_HOST:-salasanasi.fi}}"
 SITE=salasanasi.fi
 WEBROOT="/var/www/$SITE"
 

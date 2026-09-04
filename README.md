@@ -129,7 +129,7 @@ the sitemap, so a new page cannot ship unlisted.
 To publish:
 
 ```sh
-./tools/deploy-site.sh              # host defaults to kaktus.cc
+./tools/deploy-site.sh              # host defaults to salasanasi.fi
 ./tools/deploy-site.sh other.host
 ```
 
