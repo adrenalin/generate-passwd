@@ -152,6 +152,11 @@ openmat.fi so the browser only ever talks to this origin. Tracking is cookieless
 IP addresses are masked to their first two bytes (in Matomo *and* in the nginx
 access log), and DNT/GPC suppress it entirely.
 
+DNS is not deployed by these scripts — the zone lives at Hetzner and the domain's
+registrar is Vapaaradikaali itself. What should be in the zone (CAA, the DNSSEC
+DS handover, and the SPF/DMARC/IPv6 gaps found while auditing) is written down in
+[deploy/dns.md](deploy/dns.md), along with the commands to verify each one.
+
 Every page must appear in `web/sitemap.xml` — `tools/deploy-site.sh` reads each
 page's own `<link rel="canonical">` and refuses to deploy if one is missing from
 the sitemap, so a new page cannot ship unlisted.
