@@ -97,8 +97,15 @@ if ! ssh "$HOST" "test -w '$WEBROOT'"; then
 	exit 1
 fi
 
+# RFC 9116 requires an Expires field and treats a past one as invalid, so the date
+# is stamped at publish time rather than left to rot in the repo: a year from now,
+# refreshed by every deploy.
+expires=$(date -u -d '+1 year' +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u -v+1y +%Y-%m-%dT%H:%M:%SZ)
+sed -i "s|^Expires: .*|Expires: $expires|" "$STAGE/.well-known/security.txt"
+echo "    security.txt expires $expires"
+
 echo "==> copying to $HOST:$WEBROOT"
-rsync -rlt --delete --chmod=D755,F644 --exclude '.well-known' \
+rsync -rlt --delete --chmod=D755,F644 --exclude '.well-known/acme-challenge' \
 	-e ssh "$STAGE/" "$HOST:$WEBROOT/"
 
 # The headlines would otherwise be as old as the last deploy. The builder runs on

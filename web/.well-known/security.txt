@@ -1,0 +1,13 @@
+# salasanasi.fi — turvallisuusyhteystiedot (RFC 9116)
+# Security contact for salasanasi.fi, operated by Vapaaradikaali.
+#
+# Löysitkö haavoittuvuuden? Kerro siitä alla olevan osoitteen kautta.
+# Sivuston lähdekoodi on avointa: https://github.com/adrenalin/generate-passwd
+#
+# Expires-kenttä leimataan julkaisun yhteydessä (tools/deploy-site.sh),
+# vuosi julkaisuhetkestä eteenpäin.
+
+Contact: https://www.vapaaradikaali.fi/
+Expires: 2027-09-07T00:00:00Z
+Preferred-Languages: fi, en
+Canonical: https://www.salasanasi.fi/.well-known/security.txt

@@ -182,6 +182,32 @@ all, so the Matomo proxy keeps using IPv4.
   list takes months. The current header is already worth a full grade from both
   scanners without it.
 
+## internet.nl findings, fixed 2026-09-07
+
+The browser-only internet.nl scan raised two things the API scanners had not:
+
+- **SHA224 as a key-exchange hash** (a "phase out" verdict on both addresses).
+  certbot's shared `options-ssl-nginx.conf` sets protocols and ciphers but says
+  nothing about signature algorithms, so OpenSSL's defaults applied and a
+  SHA224-only client was accepted. The vhost now pins the list in both TLS server
+  blocks with `ssl_conf_command SignatureAlgorithms` — ECDSA and RSA-PSS from
+  SHA-256 upwards. Verified by handshaking with one algorithm at a time:
+  `ECDSA+SHA224` and `RSA+SHA224` are refused, `ECDSA+SHA256` and `+SHA384`
+  succeed, on IPv4 and IPv6 alike.
+- **No `/.well-known/security.txt`.** There is one now, and two things had to
+  change for it to be servable at all: the vhost's `location ~ /\.` blanket deny
+  would have answered 403, so `location ^~ /.well-known/` resolves first, and the
+  deploy's rsync exclude was narrowed from `.well-known` to
+  `.well-known/acme-challenge` so the file ships while certbot's challenge
+  directory stays untouched.
+
+`Contact:` is the Vapaaradikaali site rather than a mailbox — deliberately, so
+that no address is published for harvesting. RFC 9116 also requires `Expires`,
+and treats a date in the past as invalid, so `tools/deploy-site.sh` stamps it a
+year ahead at publish time instead of leaving a date to rot in the repo. The
+practical consequence: **a site left undeployed for over a year fails this check
+again.**
+
 ## Audit results (2026-09-07)
 
 | Scan | Result |

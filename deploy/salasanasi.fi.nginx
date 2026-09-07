@@ -31,6 +31,13 @@ server {
 	include /etc/letsencrypt/options-ssl-nginx.conf;
 	ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
+	# internet.nl moittii SHA224:ää allekirjoitusalgoritmina ("phase out"), ja
+	# certbotin jakama options-ssl-nginx.conf ei rajaa niitä lainkaan — se asettaa
+	# vain protokollat ja cipherit. Rajataan siis tässä: nykyaikaiset ECDSA- ja
+	# RSA-PSS-yhdistelmät SHA-256:sta ylöspäin, ei SHA-1:tä eikä SHA-224:ää.
+	# Varmenne on ECDSA P-256, joten RSA-rivit ovat varalla eivätkä käytössä.
+	ssl_conf_command SignatureAlgorithms ECDSA+SHA256:ECDSA+SHA384:ECDSA+SHA512:rsa_pss_pss_sha256:rsa_pss_pss_sha384:rsa_pss_pss_sha512:rsa_pss_rsae_sha256:rsa_pss_rsae_sha384:rsa_pss_rsae_sha512:RSA+SHA256:RSA+SHA384:RSA+SHA512;
+
 	add_header Strict-Transport-Security "max-age=63072000" always;
 
 	return 301 https://www.salasanasi.fi$request_uri;
@@ -52,6 +59,13 @@ server {
 	ssl_certificate_key /etc/letsencrypt/live/salasanasi.fi/privkey.pem;
 	include /etc/letsencrypt/options-ssl-nginx.conf;
 	ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+	# internet.nl moittii SHA224:ää allekirjoitusalgoritmina ("phase out"), ja
+	# certbotin jakama options-ssl-nginx.conf ei rajaa niitä lainkaan — se asettaa
+	# vain protokollat ja cipherit. Rajataan siis tässä: nykyaikaiset ECDSA- ja
+	# RSA-PSS-yhdistelmät SHA-256:sta ylöspäin, ei SHA-1:tä eikä SHA-224:ää.
+	# Varmenne on ECDSA P-256, joten RSA-rivit ovat varalla eivätkä käytössä.
+	ssl_conf_command SignatureAlgorithms ECDSA+SHA256:ECDSA+SHA384:ECDSA+SHA512:rsa_pss_pss_sha256:rsa_pss_pss_sha384:rsa_pss_pss_sha512:rsa_pss_rsae_sha256:rsa_pss_rsae_sha384:rsa_pss_rsae_sha512:RSA+SHA256:RSA+SHA384:RSA+SHA512;
 
 	include snippets/salasanasi-headers.conf;
 
@@ -202,6 +216,15 @@ server {
 	# tarkoituksella välittämättä. 404 eikä 403, jottei tämä osoite kerro takanaan
 	# olevan mittausjärjestelmää lainkaan.
 	location /stats/ { return 404; }
+
+	# ── Turvallisuusyhteystiedot (RFC 9116) ──────────────────────────
+	# /.well-known/ osuisi muuten alempana olevaan pistetiedostojen estoon ja
+	# vastaisi 403:lla. ^~-etuliite ratkeaa ennen regexiä, joten tämä ohittaa sen.
+	# Saman polun alla ovat certbotin ACME-haasteet HTTP-lohkossa.
+	location ^~ /.well-known/ {
+		default_type text/plain;
+		expires 1h;
+	}
 
 	# $uri.html tarjoilee siistit osoitteet, esimerkiksi /tietosuoja.
 	location / {
