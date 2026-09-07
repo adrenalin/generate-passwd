@@ -93,7 +93,32 @@ input:focus-visible {
 	max-width: var(--measure);
 	margin-inline: auto;
 	padding-block: 0.9rem;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem 1.5rem;
 }
+
+/* Päävalikko. Nykyinen sivu merkitään alleviivauksella samaan tapaan kuin
+   generaattorin välilehdet, jotta sivuston kaksi työkalua näyttävät saman
+   ilmeen osilta eivätkä kahdelta eri sivustolta. */
+.site-nav {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0 1.4rem;
+}
+
+.site-nav a {
+	font-size: 1rem;
+	font-weight: 600;
+	color: var(--highlight);
+	text-decoration: none;
+	padding: 0.2rem 0;
+	border-bottom: 3px solid transparent;
+}
+.site-nav a:hover { color: var(--highlight-dark); border-bottom-color: var(--line); }
+.site-nav a.is-current { color: var(--ink); border-bottom-color: var(--highlight); }
 
 .wordmark {
 	display: inline-flex;
@@ -392,7 +417,9 @@ pre code { background: none; border: 0; padding: 0; font-size: 0.9375rem; line-h
 	.site-header, .hero, main, .site-footer { padding-inline: 1.25rem; }
 	.hero-inner { padding-block: 2rem 2.5rem; }
 	main { padding-block: 2rem 3rem; }
-	.bar { padding-block: 0.8rem; }
+	.bar { padding-block: 0.8rem; gap: 0.35rem 1rem; }
+	.site-nav { gap: 0 1.1rem; }
+	.site-nav a { font-size: 0.9375rem; }
 	.footer-inner { padding-block: 1.75rem 2rem; }
 	.generator { padding: 1.25rem; margin-top: -3.75rem; }
 	.modes { overflow-x: auto; }

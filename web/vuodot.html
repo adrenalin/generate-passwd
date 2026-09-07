@@ -4,12 +4,25 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Onko tietosi vuotanut? – salasanasi.fi</title>
-<meta name="description" content="Tarkista, onko sähköpostiosoitteesi tunnetuissa tietovuodoissa tai salasanasi vuotaneiden salasanojen listalla.">
-<!-- Varjosivu: ei vielä navigaatiossa eikä sitemapissa. Tämä rivi on myös se,
-     jonka perusteella tools/deploy-site.sh sallii sivun puuttumisen sitemapista. -->
-<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Tarkista, onko sähköpostiosoitteesi tunnetuissa tietovuodoissa tai salasanasi vuotaneiden salasanojen listalla. Salasana ei poistu selaimestasi.">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#2a6ebb">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="salasanasi.fi">
+<meta property="og:locale" content="fi_FI">
+<meta property="og:url" content="https://www.salasanasi.fi/vuodot">
+<meta property="og:title" content="Onko tietosi vuotanut? – salasanasi.fi">
+<meta property="og:description" content="Tarkista, onko sähköpostiosoitteesi tunnetuissa tietovuodoissa tai salasanasi vuotaneiden salasanojen listalla. Salasana ei poistu selaimestasi.">
+<meta property="og:image" content="https://www.salasanasi.fi/salasanasi.fi-pwned.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="salasanasi.fi – Tarkista onko salasanasi vuotanut murroissa">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Onko tietosi vuotanut? – salasanasi.fi">
+<meta name="twitter:description" content="Tarkista, onko sähköpostiosoitteesi tunnetuissa tietovuodoissa tai salasanasi vuotaneiden salasanojen listalla. Salasana ei poistu selaimestasi.">
+<meta name="twitter:image" content="https://www.salasanasi.fi/salasanasi.fi-pwned.jpg">
+<meta name="twitter:image:alt" content="salasanasi.fi – Tarkista onko salasanasi vuotanut murroissa">
 <link rel="canonical" href="https://www.salasanasi.fi/vuodot">
 <link rel="preload" href="/fonts/source-sans-3-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/source-sans-3-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
@@ -17,6 +30,41 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <script src="/vuodot.js" defer></script>
 <script src="/analytics.js" defer></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "@id": "https://www.salasanasi.fi/vuodot#app",
+  "url": "https://www.salasanasi.fi/vuodot",
+  "name": "Vuototarkistus – salasanasi.fi",
+  "description": "Tarkista, onko sähköpostiosoitteesi tunnetuissa tietovuodoissa tai salasanasi vuotaneiden salasanojen listalla. Salasana ei poistu selaimestasi.",
+  "inLanguage": "fi-FI",
+  "applicationCategory": "SecurityApplication",
+  "operatingSystem": "Kaikki, joissa on nykyaikainen selain",
+  "browserRequirements": "Vaatii JavaScriptin",
+  "isAccessibleForFree": true,
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "EUR"
+  },
+  "featureList": [
+    "Sähköpostiosoitteen haku tunnetuista tietovuodoista",
+    "Salasanan tarkistus k-anonymiteetilla – salasana ei poistu selaimesta",
+    "Vuotoluettelo lähteineen ja vuotaneine tietoluokkineen"
+  ],
+  "license": "https://www.gnu.org/licenses/lgpl-3.0.html",
+  "isPartOf": { "@id": "https://www.salasanasi.fi/#website" },
+  "publisher": {
+    "@type": "Organization",
+    "@id": "https://www.vapaaradikaali.fi/#organization",
+    "name": "Vapaaradikaali",
+    "url": "https://www.vapaaradikaali.fi",
+    "vatID": "FI23028524",
+    "taxID": "2302852-4"
+  }
+}
+</script>
 </head>
 <body>
 
@@ -33,6 +81,11 @@
 			</svg>
 			<span class="name">salasanasi<span class="tld">.fi</span></span>
 		</a>
+
+		<nav class="site-nav" aria-label="Päävalikko">
+			<a href="/">Salasanageneraattori</a>
+			<a href="/vuodot" class="is-current" aria-current="page">Vuototarkistus</a>
+		</nav>
 	</div>
 </header>
 
