@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tunnetut tietovuodot – salasanasi.fi</title>
+<meta name="description" content="Luettelo yli tuhannesta julkiseksi tulleesta tietovuodosta: mikä palvelu, milloin, kuinka monta tiliä ja mitä tietoja vuoti. Haettavissa suomeksi.">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#2a6ebb">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="salasanasi.fi">
+<meta property="og:locale" content="fi_FI">
+<meta property="og:url" content="https://www.salasanasi.fi/tietovuodot">
+<meta property="og:title" content="Tunnetut tietovuodot – salasanasi.fi">
+<meta property="og:description" content="Luettelo yli tuhannesta julkiseksi tulleesta tietovuodosta: mikä palvelu, milloin, kuinka monta tiliä ja mitä tietoja vuoti. Haettavissa suomeksi.">
+<meta property="og:image" content="https://www.salasanasi.fi/salasanasi.fi-pwned.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="salasanasi.fi – Tarkista onko salasanasi vuotanut murroissa">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Tunnetut tietovuodot – salasanasi.fi">
+<meta name="twitter:description" content="Luettelo yli tuhannesta julkiseksi tulleesta tietovuodosta: mikä palvelu, milloin, kuinka monta tiliä ja mitä tietoja vuoti. Haettavissa suomeksi.">
+<meta name="twitter:image" content="https://www.salasanasi.fi/salasanasi.fi-pwned.jpg">
+<meta name="twitter:image:alt" content="salasanasi.fi – Tarkista onko salasanasi vuotanut murroissa">
+<link rel="canonical" href="https://www.salasanasi.fi/tietovuodot">
+<link rel="preload" href="/fonts/source-sans-3-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/source-sans-3-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/style.css">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<script src="/breach-terms.js" defer></script>
+<script src="/tietovuodot.js" defer></script>
+<script src="/analytics.js" defer></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "@id": "https://www.salasanasi.fi/tietovuodot#page",
+  "url": "https://www.salasanasi.fi/tietovuodot",
+  "name": "Tunnetut tietovuodot",
+  "description": "Luettelo julkiseksi tulleista tietovuodoista: mikä palvelu, milloin, kuinka monta tiliä ja mitä tietoja vuoti. Haettavissa suomeksi.",
+  "inLanguage": "fi-FI",
+  "isPartOf": { "@id": "https://www.salasanasi.fi/#website" },
+  "license": "https://creativecommons.org/licenses/by/4.0/",
+  "publisher": {
+    "@type": "Organization",
+    "@id": "https://www.vapaaradikaali.fi/#organization",
+    "name": "Vapaaradikaali",
+    "url": "https://www.vapaaradikaali.fi",
+    "vatID": "FI23028524",
+    "taxID": "2302852-4"
+  }
+}
+</script>
+</head>
+<body>
+
+<header class="site-header">
+	<div class="bar">
+		<a class="wordmark" href="/">
+			<svg class="mark" viewBox="0 0 32 32" width="32" height="32" aria-hidden="true" focusable="false">
+				<rect width="32" height="32" rx="2" fill="#00357a"/>
+				<path d="M11 14v-3a5 5 0 0 1 10 0v3" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
+				<rect x="8" y="14" width="16" height="12" rx="1.5" fill="#fff"/>
+				<circle cx="12.5" cy="20" r="1.5" fill="#00357a"/>
+				<circle cx="16" cy="20" r="1.5" fill="#00357a"/>
+				<circle cx="19.5" cy="20" r="1.5" fill="#00357a"/>
+			</svg>
+			<span class="name">salasanasi<span class="tld">.fi</span></span>
+		</a>
+
+		<nav class="site-nav" aria-label="Päävalikko">
+			<a href="/">Salasanageneraattori</a>
+			<a href="/vuodot">Vuototarkistus</a>
+			<a href="/tietovuodot" class="is-current" aria-current="page">Vuotoluettelo</a>
+			<a href="/vahvuus">Vahvuustesti</a>
+			<a href="/uutiset">Uutiset</a>
+		</nav>
+	</div>
+</header>
+
+<div class="hero">
+	<div class="hero-inner">
+		<h1 class="hero-title">Tunnetut tietovuodot</h1>
+		<p class="hero-lead">
+			Mitkä palvelut ovat vuotaneet, milloin ja mitä niistä lähti. Yli tuhat
+			julkiseksi tullutta tietomurtoa, haettavissa suomeksi.
+		</p>
+	</div>
+</div>
+
+<main>
+
+<section class="generator" aria-label="Vuotoluettelo">
+	<div class="modes" role="radiogroup" aria-label="Näkymä">
+		<button type="button" class="mode is-active" data-mode="list" role="radio" aria-checked="true">Selaa vuotoja</button>
+		<button type="button" class="mode" data-mode="numbers" role="radio" aria-checked="false">Vuodot lukuina</button>
+	</div>
+
+	<!-- Luettelo -->
+	<div class="panel" data-panel="list">
+		<div class="stats" id="highlights"></div>
+
+		<form id="search-form" class="check-form">
+			<div class="search-row">
+				<div class="search-field">
+					<label for="search">Hae palvelua, verkkotunnusta tai vuotanutta tietoa</label>
+					<input type="search" id="search" name="search" autocomplete="off"
+						spellcheck="false" autocapitalize="off"
+						placeholder="esimerkiksi adobe, linkedin.com tai terveystiedot" disabled>
+				</div>
+				<div class="search-field is-narrow">
+					<label for="sort">Järjestys</label>
+					<select id="sort" disabled>
+						<option value="newest" selected>uusin vuoto ensin</option>
+						<option value="oldest">vanhin vuoto ensin</option>
+						<option value="largest">suurin ensin</option>
+						<option value="added">viimeksi lisätty ensin</option>
+					</select>
+				</div>
+			</div>
+		</form>
+
+		<p class="status" id="status" role="status"></p>
+		<p class="list-summary" id="summary" aria-live="polite"></p>
+
+		<ol class="breaches" id="breach-list"></ol>
+
+		<p class="more-row" id="more-row" hidden>
+			<button type="button" class="copy" id="more">Näytä lisää</button>
+		</p>
+	</div>
+
+	<!-- Luvut -->
+	<div class="panel" data-panel="numbers" hidden>
+		<p class="check-lead">
+			Sama aineisto kootusti: mitä tietoja vuodoissa yleisimmin paljastuu, miten
+			vuotojen määrä on kehittynyt ja mistä toimialoista tietoa vuotaa eniten.
+		</p>
+		<p class="status" id="numbers-status" role="status"></p>
+		<div id="numbers"></div>
+	</div>
+</section>
+
+<noscript>
+	<section class="prose">
+		<p class="notice">Luettelo vaatii JavaScriptin: aineisto haetaan ja suodatetaan selaimessasi.</p>
+	</section>
+</noscript>
+
+<section class="prose">
+
+	<h2 id="mika-tama-on">Mikä tämä luettelo on</h2>
+	<p>
+		Tämä on luettelo tietomurroista, jotka ovat tulleet julkisiksi: mikä palvelu
+		murrettiin, milloin, kuinka monen ihmisen tili oli mukana ja mitä tietoja
+		heistä paljastui. Se ei kerro mitään sinusta – siihen on erillinen
+		<a href="/vuodot">vuototarkistus</a>, jossa voit kysyä omalla
+		sähköpostiosoitteellasi.
+	</p>
+	<p>
+		Luettelon voi lukea kahtena asiana. Yksittäisenä tapauksena: <em>tuo palvelu,
+		jota käytin vuonna 2016, vuoti, ja sieltä lähti salasanoja.</em> Ja
+		kokonaisuutena: <em>näin usein ja näin isoissa erissä tavallisten ihmisten
+		tiedot päätyvät vääriin käsiin.</em> Jälkimmäinen on se, joka kannattaa pitää
+		mielessä salasanoja valitessa. Vuoto ei ole poikkeus, jota sinulle ei satu.
+		Se on tavanomainen tapahtuma, jonka varalta kannattaa varautua etukäteen –
+		omalla salasanalla jokaiseen palveluun.
+	</p>
+
+	<h2 id="miten-lukuja-luetaan">Miten lukuja luetaan</h2>
+	<ul class="facts">
+		<li>
+			<strong>Tilejä, ei ihmisiä.</strong> Sama ihminen on tyypillisesti useassa
+			vuodossa, joten luvut eivät laske yhteen ihmisiksi. Miljardi vuotanutta tiliä
+			ei tarkoita miljardia ihmistä.
+		</li>
+		<li>
+			<strong>Päivämäärä on vuodon ajankohta,</strong> ei julkaisun. Moni murto
+			havaitaan ja julkaistaan vasta vuosia myöhemmin – siihen asti tiedot ovat jo
+			liikkeellä. Siksi luettelon loppupää täydentyy yhä vanhoillakin vuosilla.
+		</li>
+		<li>
+			<strong>Vahvistamaton</strong> tarkoittaa, ettei aineiston alkuperää ole voitu
+			varmistaa. Tiedot voivat silti olla aitoja, mutta ne voivat olla myös koottuja
+			muualta tai osin sepitettyjä.
+		</li>
+		<li>
+			<strong>Arkaluonteiset vuodot</strong> ovat luettelossa mukana, mutta niitä ei
+			voi hakea sähköpostiosoitteella missään palvelussa – juuri siksi, ettei kenenkään
+			yksityiselämää voisi selvittää kirjoittamalla hänen osoitteensa hakukenttään.
+		</li>
+		<li>
+			<strong>Luettelo ei ole täydellinen.</strong> Kaikkia murtoja ei havaita,
+			kaikkia ei julkaista eikä yksikään tietokanta kata niitä kaikkia. Puuttuminen ei
+			ole todiste siitä, ettei palvelu ole vuotanut.
+		</li>
+	</ul>
+
+	<h2 id="loysitko-palvelun">Löysitkö palvelun, jota käytät?</h2>
+	<p>
+		Toimi näin, tässä järjestyksessä:
+	</p>
+	<ul class="facts">
+		<li>
+			<strong>Vaihda sen palvelun salasana</strong> – ja ennen kaikkea kaikkialta
+			muualta, missä sama salasana on käytössä. Juuri sitä hyökkääjät kokeilevat
+			automaattisesti heti, kun uusi vuoto ilmestyy.
+		</li>
+		<li>
+			<strong>Tarkista, mitä vuodossa paljastui.</strong> Jos listalla lukee
+			<em>salasanat</em>, kiire on suurin. Jos listalla on
+			<em>turvakysymykset ja vastaukset</em>, vaihda myös ne – ne eivät vanhene itsestään.
+		</li>
+		<li>
+			<strong>Ota kaksivaiheinen tunnistautuminen käyttöön</strong> siellä, missä se on
+			tarjolla. Se suojaa silloinkin, kun salasana on jo vuotanut.
+		</li>
+		<li>
+			<strong>Tarkista oma osoitteesi</strong> <a href="/vuodot">vuototarkistuksella</a>
+			ja <a href="/">arvo tilalle uudet salasanat</a>. Salasanojen hallintaohjelma
+			muistaa ne puolestasi – siitä on lisää <a href="/#salasanojen-hallinta">etusivulla</a>.
+		</li>
+	</ul>
+
+	<h2 id="mista-tiedot">Mistä tiedot tulevat</h2>
+	<p>
+		Emme ylläpidä omaa vuototietokantaa. Luettelo on
+		<a href="https://haveibeenpwned.com/">Have I Been Pwnedin</a> julkista aineistoa
+		(<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>), ja
+		tilastonäkymän vuosi- ja toimialaluvut tulevat
+		<a href="https://xposedornot.com/">XposedOrNotilta</a>. Vuotojen nimet, päivät,
+		koot ja kuvaukset ovat heidän aineistoaan; suomennokset ja laskelmat ovat meidän.
+	</p>
+	<p>
+		<strong>Tämä sivu ei ota selaimestasi yhteyttä kumpaankaan palveluun.</strong>
+		Toisin kuin <a href="/vuodot">vuototarkistuksessa</a>, tässä ei kysytä mitään
+		sinusta, joten aineistoa ei tarvitse hakea selaimestasi: palvelimemme noutaa saman
+		julkisen luettelon muutaman tunnin välein koko sivuston puolesta ja tarjoilee sen
+		välimuististaan osoitteesta <code>/data/</code>. Selaimesi puhuu siis vain tälle
+		sivustolle, eikä IP-osoitteesi päädy kummallekaan tietokannan ylläpitäjälle.
+	</p>
+	<p class="note">
+		Kumpikaan palvelu ei ole yhteydessä Vapaaradikaaliin emmekä vastaa niiden
+		toiminnasta, saatavuudesta tai tietojen oikeellisuudesta.
+	</p>
+
+</section>
+
+</main>
+
+<footer class="site-footer">
+	<div class="footer-inner">
+		<p>
+			<a href="/">Takaisin salasanageneraattoriin</a> ·
+			<a href="https://github.com/adrenalin/generate-passwd">Lähdekoodi GitHubissa</a> ·
+			GNU LGPL v3 tai uudempi
+		</p>
+		<p class="fine">
+			Palvelun tarjoaa <a href="https://www.vapaaradikaali.fi">Vapaaradikaali</a>, Y-tunnus 2302852-4.
+			<a href="/tietosuoja">Tietosuojaseloste</a>.
+		</p>
+		<p class="fine">
+			Vuotoluettelo © <a href="https://haveibeenpwned.com/">Have I Been Pwned</a>
+			(<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>) ·
+			tilastot <a href="https://xposedornot.com/">XposedOrNot</a>
+		</p>
+	</div>
+</footer>
+
+</body>
+</html>

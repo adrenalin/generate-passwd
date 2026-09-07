@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kuinka vahva salasanasi on? – salasanasi.fi</title>
+<meta name="description" content="Testaa salasanan vahvuus selaimessasi. Arvio kertoo, montako arvausta se kestäisi ja mistä kone sen tunnistaa. Salasana ei poistu koneeltasi.">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#2a6ebb">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="salasanasi.fi">
+<meta property="og:locale" content="fi_FI">
+<meta property="og:url" content="https://www.salasanasi.fi/vahvuus">
+<meta property="og:title" content="Kuinka vahva salasanasi on? – salasanasi.fi">
+<meta property="og:description" content="Testaa salasanan vahvuus selaimessasi. Arvio kertoo, montako arvausta se kestäisi ja mistä kone sen tunnistaa. Salasana ei poistu koneeltasi.">
+<meta property="og:image" content="https://www.salasanasi.fi/salasanasi.fi.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="salasanasi.fi – Vahvoja salasanoja suomen kielen sanoista">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Kuinka vahva salasanasi on? – salasanasi.fi">
+<meta name="twitter:description" content="Testaa salasanan vahvuus selaimessasi. Arvio kertoo, montako arvausta se kestäisi ja mistä kone sen tunnistaa. Salasana ei poistu koneeltasi.">
+<meta name="twitter:image" content="https://www.salasanasi.fi/salasanasi.fi.jpg">
+<meta name="twitter:image:alt" content="salasanasi.fi – Vahvoja salasanoja suomen kielen sanoista">
+<link rel="canonical" href="https://www.salasanasi.fi/vahvuus">
+<link rel="preload" href="/fonts/source-sans-3-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/source-sans-3-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/style.css">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<script src="/vendor/zxcvbn-core.js" defer></script>
+<script src="/vendor/zxcvbn-common.js" defer></script>
+<script src="/vahvuus.js" defer></script>
+<script src="/analytics.js" defer></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "@id": "https://www.salasanasi.fi/vahvuus#app",
+  "url": "https://www.salasanasi.fi/vahvuus",
+  "name": "Salasanan vahvuustesti – salasanasi.fi",
+  "description": "Testaa salasanan vahvuus selaimessasi. Arvio kertoo, montako arvausta se kestäisi ja mistä kone sen tunnistaa. Salasana ei poistu koneeltasi.",
+  "inLanguage": "fi-FI",
+  "applicationCategory": "SecurityApplication",
+  "operatingSystem": "Kaikki, joissa on nykyaikainen selain",
+  "browserRequirements": "Vaatii JavaScriptin",
+  "isAccessibleForFree": true,
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "EUR"
+  },
+  "featureList": [
+    "Vahvuusarvio lasketaan selaimessa, salasanaa ei lähetetä minnekään",
+    "Arvio perustuu arvausten määrään, ei merkkiluokkiin",
+    "Näyttää, mistä sanakirjoista ja kuvioista salasana tunnistetaan",
+    "Suomen- ja englanninkieliset sanalistat mukana arviossa"
+  ],
+  "license": "https://www.gnu.org/licenses/lgpl-3.0.html",
+  "isPartOf": { "@id": "https://www.salasanasi.fi/#website" },
+  "publisher": {
+    "@type": "Organization",
+    "@id": "https://www.vapaaradikaali.fi/#organization",
+    "name": "Vapaaradikaali",
+    "url": "https://www.vapaaradikaali.fi",
+    "vatID": "FI23028524",
+    "taxID": "2302852-4"
+  }
+}
+</script>
+</head>
+<body>
+
+<header class="site-header">
+	<div class="bar">
+		<a class="wordmark" href="/">
+			<svg class="mark" viewBox="0 0 32 32" width="32" height="32" aria-hidden="true" focusable="false">
+				<rect width="32" height="32" rx="2" fill="#00357a"/>
+				<path d="M11 14v-3a5 5 0 0 1 10 0v3" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
+				<rect x="8" y="14" width="16" height="12" rx="1.5" fill="#fff"/>
+				<circle cx="12.5" cy="20" r="1.5" fill="#00357a"/>
+				<circle cx="16" cy="20" r="1.5" fill="#00357a"/>
+				<circle cx="19.5" cy="20" r="1.5" fill="#00357a"/>
+			</svg>
+			<span class="name">salasanasi<span class="tld">.fi</span></span>
+		</a>
+
+		<nav class="site-nav" aria-label="Päävalikko">
+			<a href="/">Salasanageneraattori</a>
+			<a href="/vuodot">Vuototarkistus</a>
+			<a href="/tietovuodot">Vuotoluettelo</a>
+			<a href="/vahvuus" class="is-current" aria-current="page">Vahvuustesti</a>
+			<a href="/uutiset">Uutiset</a>
+		</nav>
+	</div>
+</header>
+
+<div class="hero">
+	<div class="hero-inner">
+		<h1 class="hero-title">Kuinka vahva salasanasi on?</h1>
+		<p class="hero-lead">
+			Arvio lasketaan selaimessasi. Salasana ei poistu koneeltasi – ei meille
+			eikä kenellekään muulle.
+		</p>
+	</div>
+</div>
+
+<main>
+
+<section class="generator" aria-label="Vahvuustesti">
+	<p class="check-lead">
+		Testi ei laske isoja kirjaimia ja erikoismerkkejä. Se laskee, montako arvausta
+		salasana kestäisi: se etsii sanakirjaosumat, näppäimistökuviot, vuosiluvut,
+		toistot ja tutut kirjainkorvaukset ja katsoo, kuinka nopeasti murtokone pääsee
+		niiden läpi.
+	</p>
+
+	<form id="strength-form" class="check-form" autocomplete="off">
+		<label for="password">Salasana</label>
+		<div class="check-row">
+			<input type="password" id="password" name="password" autocomplete="off"
+				spellcheck="false" autocapitalize="off" autocorrect="off"
+				placeholder="Kirjoita tai liitä salasana">
+			<button type="button" class="copy" id="password-reveal" aria-pressed="false">Näytä</button>
+			<button type="button" class="copy" id="password-clear">Tyhjennä</button>
+		</div>
+	</form>
+
+	<p class="notice">
+		<strong>Salasanaa ei lähetetä minnekään.</strong> Sivu ei ota verkkoyhteyttä
+		salasanan takia lainkaan: arvio lasketaan selaimessasi, ja kenttään kirjoitettu
+		teksti pysyy koneellasi. Voit halutessasi katkaista verkkoyhteyden ennen
+		kirjoittamista – sivu toimii silti. <a href="#mitaan-ei-laheteta">Tarkemmin alla.</a>
+	</p>
+
+	<p class="samples">
+		Kokeile esimerkillä:
+		<button type="button" class="chip" data-sample="Kissa2019!">Kissa2019!</button>
+		<button type="button" class="chip" data-sample="P@ssw0rd">P@ssw0rd</button>
+		<button type="button" class="chip" data-sample="qwerty123">qwerty123</button>
+		<button type="button" class="chip" data-sample="lapio-Takertua-seniori-muija">neljä arvottua sanaa</button>
+	</p>
+
+	<p class="status" id="status" role="status"></p>
+	<div id="result" aria-live="polite"></div>
+</section>
+
+<noscript>
+	<section class="prose">
+		<p class="notice">Vahvuusarvio vaatii JavaScriptin: laskenta tehdään selaimessasi.</p>
+	</section>
+</noscript>
+
+<section class="prose">
+
+	<h2 id="miksi-merkkiluokat-eivat-riita">Miksi ”iso kirjain, numero ja erikoismerkki” ei kerro vahvuutta</h2>
+	<p>
+		Tuttu sääntö on peräisin ajalta, jolloin salasanoja arvattiin kirjautumislomakkeen
+		kautta. Nykyään ne murretaan varastetusta tunnustietokannasta hyökkääjän omalla
+		koneella, ja kokeilujärjestys ei ole <em>aaaa, aaab, aaac</em> vaan: ensin kaikki
+		aiemmin vuotaneet salasanat, sitten sanakirjat, sitten sanakirjat tuttuine
+		muunnoksineen. <strong>Kissa2019!</strong> täyttää kaikki merkkiluokkasäännöt ja
+		on silti muutaman miljoonan arvauksen päässä: se on yksi sana, vuosiluku ja
+		huutomerkki – kolme ennalta-arvattavaa palasta.
+	</p>
+	<p>
+		Tämä testi laskee juuri sen: kuinka monta arvausta tarvitaan, kun kokeilu tehdään
+		fiksusti eikä sokkona. Siksi tulos voi olla ankarampi kuin monen palvelun oma
+		vahvuusmittari, joka laskee vain merkkejä ja merkkiluokkia.
+	</p>
+
+	<h2 id="mita-bitit-tarkoittavat">Mitä bittiluku tarkoittaa</h2>
+	<p>
+		Bitti on kaksinkertaistuminen: yksi bitti lisää tuplaa arvausten määrän.
+		40 bittiä on noin tuhat miljardia vaihtoehtoa – paljon ihmisen mielessä, ei
+		mitään koneelle, joka kokeilee miljardeja arvauksia sekunnissa. Karkea asteikko:
+	</p>
+	<table class="strength-table">
+		<thead>
+			<tr><th>Arvausvastus</th><th>Mihin riittää</th></tr>
+		</thead>
+		<tbody>
+			<tr><td>alle 36 bittiä</td><td>ei mihinkään</td></tr>
+			<tr><td>36–60 bittiä</td><td>kestää hetken, ei tärkeään</td></tr>
+			<tr><td>60–80 bittiä</td><td>kohtalainen, riittää vähäpätöiseen</td></tr>
+			<tr><td>80–100 bittiä</td><td>vahva, riittää käytännössä kaikkeen</td></tr>
+			<tr><td>yli 128 bittiä</td><td>vastaa vahvaa salausavainta</td></tr>
+		</tbody>
+	</table>
+	<p class="note">
+		Vertailun vuoksi: tämän sivuston arpoma kahdeksan suomenkielisen sanan salasana on
+		noin 124 bittiä ja neljän sanan noin 62 bittiä. Luvut ja niiden perustelut ovat
+		<a href="/#entropia">etusivun taulukossa</a>. Arvottu salasana on aina vahvempi
+		kuin yhtä pitkä itse keksitty, koska arvottu ei sisällä mitään, minkä kone voisi
+		päätellä.
+	</p>
+
+	<h2 id="mitaan-ei-laheteta">Mitään ei lähetetä</h2>
+	<ul class="facts">
+		<li>
+			<strong>Salasana ei poistu selaimestasi.</strong> Arviointikirjasto ja sanalistat
+			ladataan tältä samalta sivustolta, ja laskenta tapahtuu koneellasi. Kenttään
+			kirjoitettua tekstiä ei lähetetä meille, kolmannelle osapuolelle eikä
+			kävijämittaukseen missään muodossa.
+		</li>
+		<li>
+			<strong>Voit tarkistaa väitteen itse.</strong> Lataa sivu, katkaise verkkoyhteys
+			ja kirjoita salasana: arvio toimii yhä. Sivun
+			<a href="https://github.com/adrenalin/generate-passwd">lähdekoodi</a> on avointa,
+			ja selaimen kehittäjätyökalujen verkkovälilehti näyttää, ettei pyyntöjä lähde.
+		</li>
+		<li>
+			<strong>Tunnistetut palaset näkyvät vain, kun salasana on näkyvissä.</strong>
+			Jos kenttä on peitettynä, tulos kertoo palasten pituudet muttei niiden sisältöä –
+			muuten peittäminen olisi näennäistä.
+		</li>
+		<li>
+			<strong>Arvio ei kerro, onko salasana vuotanut.</strong> Nekin ovat eri asioita:
+			pitkä ja monimutkainen salasana voi olla vuotanut, jolloin se on murtokoneiden
+			listoilla riippumatta vahvuudestaan. Sen tarkistat
+			<a href="/vuodot">vuototarkistuksesta</a>, joka lähettää salasanasta vain
+			tiivisteen viisi ensimmäistä merkkiä.
+		</li>
+	</ul>
+
+	<h2 id="mista-arvio-tulee">Mistä arvio tulee</h2>
+	<p>
+		Arvio lasketaan <a href="https://github.com/zxcvbn-ts/zxcvbn">zxcvbn-ts</a>-kirjastolla
+		(MIT), joka on ylläpidetty versio Dropboxilla kehitetystä
+		<a href="https://github.com/dropbox/zxcvbn">zxcvbn</a>-kirjastosta. Se on alan
+		vakiintunein tapa arvioida salasanan arvattavuutta, ja se on mukana sivuston omissa
+		tiedostoissa – ei ulkopuolisesta jakeluverkosta.
+	</p>
+	<p>
+		Sanakirjoina ovat kirjaston oma aineisto (noin 50 000 yleisintä vuotanutta salasanaa
+		sekä näppäimistökuviot) ja tämän sivuston omat sanalistat, suomeksi ja englanniksi.
+		Suomen yleissanasto on siis mukana: <em>vesikattoremontti</em> ei ole vahva salasana
+		siksi, että se on pitkä.
+	</p>
+	<p class="note">
+		Arvio on arvio. Se ei tiedä, onko salasanasi kissasi nimi tai vanha suosikkibändisi –
+		hyökkääjä, joka tuntee sinut, arvaa sellaisen nopeammin kuin mikään kirjasto olettaa.
+		Se ei myöskään tunne suomalaisia nimiä eikä paikannimiä yhtä kattavasti kuin
+		englanninkielisiä. Epävarmassa tapauksessa
+		<a href="/">arvo uusi salasana</a> – silloin arvattavuus ei ole arvion varassa.
+	</p>
+
+</section>
+
+</main>
+
+<footer class="site-footer">
+	<div class="footer-inner">
+		<p>
+			<a href="/">Takaisin salasanageneraattoriin</a> ·
+			<a href="https://github.com/adrenalin/generate-passwd">Lähdekoodi GitHubissa</a> ·
+			GNU LGPL v3 tai uudempi
+		</p>
+		<p class="fine">
+			Palvelun tarjoaa <a href="https://www.vapaaradikaali.fi">Vapaaradikaali</a>, Y-tunnus 2302852-4.
+			<a href="/tietosuoja">Tietosuojaseloste</a>.
+		</p>
+		<p class="fine">
+			Vahvuusarvio <a href="https://github.com/zxcvbn-ts/zxcvbn">zxcvbn-ts</a>
+			© Dan Wheeler, Dropbox ja zxcvbn-ts (MIT) ·
+			sanasto © <a href="https://kaino.kotus.fi/sanat/nykysuomi/">Kotimaisten kielten keskus</a> (GNU LGPL)
+		</p>
+	</div>
+</footer>
+
+</body>
+</html>

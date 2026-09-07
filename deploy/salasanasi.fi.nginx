@@ -58,7 +58,10 @@ server {
 	gzip on;
 	gzip_vary on;
 	gzip_min_length 1024;
-	gzip_types text/plain text/css application/javascript image/svg+xml;
+	gzip_types text/plain text/css application/javascript application/json image/svg+xml;
+	# Vuotoluettelo tulee proxyn läpi, ja nginx pakkaa välitetyn vastauksen vain
+	# erikseen pyydettäessä. Reilu megatavu JSONia kutistuu noin kolmasosaan.
+	gzip_proxied any;
 
 	location = /index.html {
 		expires -1;
@@ -111,6 +114,38 @@ server {
 	location = /vuodot.html {
 		include snippets/salasanasi-headers-vuodot.conf;
 	}
+
+	# ── Julkiset vuotoaineistot (/tietovuodot) ───────────────────────
+	# Nämä kaksi ovat kolmannen osapuolen julkista aineistoa, jotka tämä palvelin
+	# noutaa koko sivuston puolesta ja tarjoilee välimuististaan. Selain puhuu siis
+	# vain tälle originille, eikä kävijän IP-osoite päädy HIBP:lle tai
+	# XposedOrNotille — päinvastoin kuin /vuodot-sivulla, jossa suora yhteys on
+	# tarkoituksellinen (siellä kysytään käyttäjästä, tässä ei).
+	#
+	# Host ja SNI kiinnitetään upstreamin omaan nimeen: molemmat päät valitsevat
+	# vhostin sen perusteella, ja $host-muuttujan välittäminen antaisi 404:n.
+	# Loput asetukset ovat snippetissä.
+	location = /data/tietovuodot.json {
+		limit_req zone=sp_data burst=10 nodelay;
+
+		proxy_pass https://sp_hibp/api/v3/breaches;
+		proxy_set_header Host haveibeenpwned.com;
+		proxy_ssl_name haveibeenpwned.com;
+		include snippets/salasanasi-data-proxy.conf;
+	}
+
+	location = /data/vuotoluvut.json {
+		limit_req zone=sp_data burst=10 nodelay;
+
+		proxy_pass https://sp_xon/v1/analytics/metrics;
+		proxy_set_header Host api.xposedornot.com;
+		proxy_ssl_name api.xposedornot.com;
+		include snippets/salasanasi-data-proxy.conf;
+	}
+
+	# Muu /data/-polku ei ole olemassa. 404 eikä 403, samasta syystä kuin /stats/:
+	# osoite ei kerro, mitä sen takana mahdollisesti on.
+	location /data/ { return 404; }
 
 	# ── Kävijämittauksen proxy ───────────────────────────────────────
 	# Mittaus ei saa ylittää sivuston rajaa. Matomo on openmat.fi:llä, ja tavallinen

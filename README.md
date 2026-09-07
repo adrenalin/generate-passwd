@@ -116,10 +116,34 @@ and `/usr/share/generate-passwd/`, falling back to `/usr/share/dict/words` for
 
 ## Website
 
-<https://salasanasi.fi> is the same generator as a static page, in Finnish.
-It draws from the same two wordlists and does everything in the browser with
-`crypto.getRandomValues()` — nothing is sent to the server, and the page loads
-no third-party resources at all (enforced by a `default-src 'none'` CSP).
+<https://salasanasi.fi> is the same generator as a static page, in Finnish,
+plus four more pages built around it. The generator draws from the same two
+wordlists and does everything in the browser with `crypto.getRandomValues()` —
+nothing is sent to the server, and the page loads no third-party resources at
+all (enforced by a `default-src 'none'` CSP).
+
+| Path | What it is | Where the data comes from |
+| --- | --- | --- |
+| `/` | The generator | Nothing leaves the browser |
+| `/vuodot` | Leak check for one address or one password | The browser asks XposedOrNot and Pwned Passwords directly |
+| `/tietovuodot` | Catalogue of known breaches, searchable in Finnish | Have I Been Pwned (CC BY 4.0) and XposedOrNot, fetched by the server |
+| `/vahvuus` | Strength estimate for a password you type | zxcvbn-ts, in the browser |
+| `/uutiset` | NCSC-FI headlines | Their RSS feed, rendered at deploy time |
+| `/tietosuoja` | Privacy policy | — |
+
+Who fetches what is a deliberate split. **A query about the visitor goes
+straight from their browser**: on `/vuodot` the address and the hash prefix must
+not pass through our server, or the promise not to log them would rest on log
+settings. **A public catalogue goes through the server**: `/tietovuodot` asks
+nothing about the visitor, so `/data/tietovuodot.json` and `/data/vuotoluvut.json`
+are cached reverse proxies (six hours, stale-on-error). The visitor's IP never
+reaches Have I Been Pwned or XposedOrNot, the page keeps `connect-src 'self'`,
+and the two sources see one request per six hours instead of one per visitor.
+`/vahvuus` fetches nothing at all: `web/vendor/` carries zxcvbn-ts (MIT) so the
+estimate is computed locally with the site's own wordlists as dictionaries — see
+`web/vendor/README.md` for what is vendored and why `language-en` is not.
+`/uutiset` is rendered by `tools/build-news.py` at deploy time, so it is ordinary
+HTML with no script and no third-party request.
 
 The source is in `web/`, the nginx site in `deploy/`. There is a Finnish privacy
 policy at `/tietosuoja`, and anonymous visitor measurement through a self-hosted
@@ -139,7 +163,9 @@ To publish:
 ./tools/deploy-site.sh other.host
 ```
 
-The script stages `web/` plus the wordlists, rsyncs them to
+The script first rebuilds `/uutiset` from the NCSC-FI feed (a failure there is
+not fatal — the committed page ships unchanged), then stages `web/` plus the
+wordlists, rsyncs them to
 `/var/www/salasanasi.fi`, installs the nginx site and reloads. On a host with
 no certificate yet it first installs `deploy/salasanasi.fi.bootstrap.nginx`
 (HTTP only) so certbot can answer the ACME challenge, then swaps in the HTTPS

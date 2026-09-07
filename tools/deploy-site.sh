@@ -19,6 +19,15 @@ WEBROOT="/var/www/$SITE"
 
 cd "$(dirname "$0")/.."
 
+# The news page is rendered at build time from the NCSC-FI feed, so /uutiset is
+# plain HTML with no third-party request in the visitor's browser. A stale list
+# beats an empty one: if the feed is unreachable, the committed page is published
+# as it stands and the deploy carries on.
+echo "==> rebuilding /uutiset from the NCSC-FI feed"
+if ! ./tools/build-news.py; then
+	echo "  feed unavailable, publishing the committed web/uutiset.html unchanged" >&2
+fi
+
 # Every page must be listed in the sitemap. The canonical URL comes from the page
 # itself, so this catches both a page missing from the sitemap and a page with no
 # canonical link at all.
@@ -60,7 +69,8 @@ cp wordlist-fi.txt wordlist-en.txt "$STAGE/"
 # Version the assets by content so they can be cached for a year without a deploy
 # ever serving a stale one. The filenames stay put — only the reference gains a
 # ?v=, which is enough to make it a different cache entry.
-for asset in style.css app.js analytics.js vuodot.js; do
+for asset in style.css app.js analytics.js breach-terms.js vuodot.js tietovuodot.js \
+		vahvuus.js vendor/zxcvbn-core.js vendor/zxcvbn-common.js; do
 	version=$(sha256sum "$STAGE/$asset" | cut -c1-10)
 	sed -i "s|\"/$asset\"|\"/$asset?v=$version\"|g" "$STAGE"/*.html
 	echo "    $asset -> ?v=$version"
@@ -75,7 +85,8 @@ rsync -rlt --delete --chmod=D755,F644 --exclude '.well-known' \
 echo "==> installing nginx site"
 scp -q "deploy/$SITE.nginx" "deploy/$SITE.bootstrap.nginx" \
 	deploy/salasanasi-shared.conf deploy/salasanasi-matomo-proxy.conf \
-	deploy/salasanasi-headers.conf deploy/salasanasi-headers-vuodot.conf "$HOST:/tmp/"
+	deploy/salasanasi-headers.conf deploy/salasanasi-headers-vuodot.conf \
+	deploy/salasanasi-data-proxy.conf "$HOST:/tmp/"
 ssh "$HOST" "set -eu
 	site=$SITE
 	webroot=$WEBROOT
@@ -86,6 +97,7 @@ ssh "$HOST" "set -eu
 	# joten väärässä järjestyksessä nginx -t kaatuisi.
 	sudo install -o root -g root -m 644 /tmp/salasanasi-shared.conf /etc/nginx/conf.d/salasanasi-shared.conf
 	sudo install -o root -g root -m 644 /tmp/salasanasi-matomo-proxy.conf /etc/nginx/snippets/salasanasi-matomo-proxy.conf
+	sudo install -o root -g root -m 644 /tmp/salasanasi-data-proxy.conf /etc/nginx/snippets/salasanasi-data-proxy.conf
 	sudo install -o root -g root -m 644 /tmp/salasanasi-headers.conf /etc/nginx/snippets/salasanasi-headers.conf
 	sudo install -o root -g root -m 644 /tmp/salasanasi-headers-vuodot.conf /etc/nginx/snippets/salasanasi-headers-vuodot.conf
 
@@ -110,6 +122,7 @@ ssh "$HOST" "set -eu
 	install_conf \"\$site.nginx\"
 	rm -f \"/tmp/\$site.nginx\" \"/tmp/\$site.bootstrap.nginx\" \
 		/tmp/salasanasi-shared.conf /tmp/salasanasi-matomo-proxy.conf \
+		/tmp/salasanasi-data-proxy.conf \
 		/tmp/salasanasi-headers.conf /tmp/salasanasi-headers-vuodot.conf"
 
 echo "==> done: https://www.$SITE/"

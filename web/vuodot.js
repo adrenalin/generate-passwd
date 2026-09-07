@@ -20,6 +20,9 @@
  *
  * Kaikki ulkopuolinen data kirjoitetaan DOM:iin textContentilla, ei koskaan
  * innerHTML:llä: vuotokuvaukset ja tietoluokat tulevat kolmannelta osapuolelta.
+ *
+ * Tietoluokkien ja toimialojen suomennokset ovat breach-terms.js:ssä, jaossa
+ * /tietovuodot-sivun kanssa. Se on ladattava ennen tätä tiedostoa.
  */
 'use strict';
 
@@ -28,136 +31,6 @@
 	var HIBP_URL = 'https://api.pwnedpasswords.com/range/';
 
 	/* ---- sanastot ---- */
-
-	// XposedOrNotin tietoluokat. Tuntematon luokka näytetään sellaisenaan englanniksi
-	// – parempi kuin jättää kertomatta, että jotain muutakin vuoti.
-	var DATA_CLASSES = {
-		'Account balances': 'tilisaldot',
-		'Ages': 'iät',
-		'Apps installed on devices': 'asennetut sovellukset',
-		'Auth tokens': 'kirjautumispolettit',
-		'Avatars': 'profiilikuvat',
-		'Bank account numbers': 'pankkitilinumerot',
-		'Bios': 'esittelytekstit',
-		'Browser user agents': 'selaintiedot',
-		'Career levels': 'urataso',
-		'Chat logs': 'keskusteluhistoria',
-		'Credit card details': 'maksukorttitiedot',
-		'Credit status information': 'luottotiedot',
-		'Customer feedback': 'asiakaspalaute',
-		'Dates of birth': 'syntymäajat',
-		'Device information': 'laitetiedot',
-		'Device usage tracking data': 'laitteen käyttöseuranta',
-		'Driver’s licenses': 'ajokorttitiedot',
-		'Drinking habits': 'alkoholinkäyttö',
-		'Education levels': 'koulutustaso',
-		'Email addresses': 'sähköpostiosoitteet',
-		'Employers': 'työnantajat',
-		'Employment statuses': 'työtilanne',
-		'Encrypted keys': 'salatut avaimet',
-		'Ethnicities': 'etninen tausta',
-		'Family members’ names': 'perheenjäsenten nimet',
-		'Financial transactions': 'maksutapahtumat',
-		'Genders': 'sukupuoli',
-		'Geographic locations': 'sijaintitiedot',
-		'Government IDs': 'viranomaistunnisteet',
-		'Government issued IDs': 'viranomaistunnisteet',
-		'Health insurance information': 'sairausvakuutustiedot',
-		'Historical passwords': 'vanhat salasanat',
-		'Homepage URLs': 'kotisivujen osoitteet',
-		'Income levels': 'tulotaso',
-		'Instant messenger identities': 'pikaviestitunnukset',
-		'IP addresses': 'IP-osoitteet',
-		'Job titles': 'ammattinimikkeet',
-		'Licence plates': 'rekisteritunnukset',
-		'Login histories': 'kirjautumishistoria',
-		'MAC addresses': 'MAC-osoitteet',
-		'Marital statuses': 'siviilisääty',
-		'Medical conditions': 'terveystiedot',
-		'Names': 'nimet',
-		'Nationalities': 'kansalaisuudet',
-		'Nicknames': 'lempinimet',
-		'Occupations': 'ammatit',
-		'Partial credit card data': 'osittaiset maksukorttitiedot',
-		'Partial government issued IDs': 'osittaiset viranomaistunnisteet',
-		'Passport numbers': 'passinumerot',
-		'Password hints': 'salasanavihjeet',
-		'Password strengths': 'salasanojen vahvuudet',
-		'Passwords': 'salasanat',
-		'Payment histories': 'maksuhistoria',
-		'Personal descriptions': 'henkilökuvaukset',
-		'Phone numbers': 'puhelinnumerot',
-		'Photos': 'valokuvat',
-		'Physical addresses': 'postiosoitteet',
-		'Physical attributes': 'ulkoiset tuntomerkit',
-		'Places of birth': 'syntymäpaikat',
-		'Political views': 'poliittiset näkemykset',
-		'Private messages': 'yksityisviestit',
-		'Profile photos': 'profiilikuvat',
-		'Purchases': 'ostokset',
-		'Purchasing habits': 'ostotottumukset',
-		'Recovery email addresses': 'palautussähköpostiosoitteet',
-		'Relationship statuses': 'parisuhdetilanne',
-		'Religions': 'uskonnollinen vakaumus',
-		'Salutations': 'puhuttelumuodot',
-		'Security questions and answers': 'turvakysymykset ja vastaukset',
-		'Sexual orientations': 'seksuaalinen suuntautuminen',
-		'SMS messages': 'tekstiviestit',
-		'Smoking habits': 'tupakointi',
-		'Social media profiles': 'sosiaalisen median profiilit',
-		'Social security numbers': 'henkilötunnukset',
-		'Spoken languages': 'puhutut kielet',
-		'Support tickets': 'tukipyynnöt',
-		'Survey results': 'kyselyvastaukset',
-		'Time zones': 'aikavyöhykkeet',
-		'Titles': 'tittelit',
-		'Travel habits': 'matkustustottumukset',
-		'Usernames': 'käyttäjätunnukset',
-		'Vehicle details': 'ajoneuvotiedot',
-		'Vehicle registration numbers': 'ajoneuvojen rekisteritunnukset',
-		'Website activity': 'sivuston käyttöhistoria',
-		'Work habits': 'työtavat',
-		'Years of professional experience': 'työkokemusvuodet'
-	};
-
-	var INDUSTRIES = {
-		'Adult': 'aikuisviihde',
-		'Aerospace': 'ilmailu',
-		'Agriculture': 'maatalous',
-		'Automotive': 'autoala',
-		'Construction': 'rakentaminen',
-		'Consulting': 'konsultointi',
-		'Cryptocurrency': 'kryptovaluutat',
-		'Dating': 'deittipalvelut',
-		'Education': 'koulutus',
-		'Electronics': 'elektroniikka',
-		'Energy': 'energia',
-		'Entertainment': 'viihde',
-		'Finance': 'rahoitus',
-		'Food': 'ruoka',
-		'Gaming': 'pelit',
-		'Government': 'julkishallinto',
-		'Health Care': 'terveydenhuolto',
-		'Hospitality': 'matkailu ja ravintola',
-		'Information Technology': 'tietotekniikka',
-		'Insurance': 'vakuutus',
-		'Legal': 'oikeudelliset palvelut',
-		'Logistics': 'logistiikka',
-		'Manufacturing': 'teollisuus',
-		'Marketing': 'markkinointi',
-		'Miscellaneous': 'sekalaiset',
-		'Music': 'musiikki',
-		'News Media': 'uutismedia',
-		'Non-Profit/Charities': 'järjestöt',
-		'Pharmaceutical': 'lääketeollisuus',
-		'Real Estate': 'kiinteistöala',
-		'Retail': 'vähittäiskauppa',
-		'Social Media': 'sosiaalinen media',
-		'Sports': 'urheilu',
-		'Telecommunication': 'tietoliikenne',
-		'Transport': 'liikenne',
-		'Travel': 'matkailu'
-	};
 
 	var PASSWORD_RISK = {
 		plaintext: 'Salasanat vuotivat selväkielisinä.',
@@ -192,10 +65,6 @@
 
 	var busy = false;
 
-	function formatCount(n) {
-		return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-	}
-
 	function setStatus(message, isError) {
 		el.status.textContent = message || '';
 		el.status.classList.toggle('is-error', Boolean(isError));
@@ -226,24 +95,9 @@
 		}
 	}
 
-	// "ManchesterAirportsGroup" -> "Manchester Airports Group". Nimet ovat tunnisteita
-	// eivätkä otsikoita, joten jako tehdään vain selvässä kohdassa: pieni kirjain,
-	// jota seuraa iso. Näin "000webhost", "BTC-E" ja "OGusers-2020" jäävät ennalleen.
-	function humanise(name) {
-		return String(name || '').replace(/([a-zä-ö0-9])([A-ZÄ-Ö])/g, '$1 $2');
-	}
-
 	function translate(map, value) {
 		var key = String(value || '').trim();
 		return map[key] || key;
-	}
-
-	function dataClassList(raw) {
-		return String(raw || '')
-			.split(';')
-			.map(function (item) { return item.trim(); })
-			.filter(function (item) { return item.length > 0; })
-			.map(function (item) { return translate(DATA_CLASSES, item); });
 	}
 
 	function setBusy(state, button, label) {
@@ -258,7 +112,7 @@
 		var item = document.createElement('li');
 
 		var head = node('div', 'breach-head');
-		head.appendChild(node('h3', null, humanise(breach.breach)));
+		head.appendChild(node('h3', null, BREACH_TERMS.humanise(breach.breach)));
 		if (breach.xposed_date) {
 			head.appendChild(node('span', 'breach-year', breach.xposed_date));
 		}
@@ -266,9 +120,9 @@
 
 		var meta = [];
 		if (breach.domain) { meta.push(breach.domain); }
-		if (breach.industry) { meta.push(translate(INDUSTRIES, breach.industry)); }
+		if (breach.industry) { meta.push(BREACH_TERMS.industry(breach.industry)); }
 		if (breach.xposed_records) {
-			meta.push(formatCount(breach.xposed_records) + ' tietuetta');
+			meta.push(BREACH_TERMS.formatCount(breach.xposed_records) + ' tietuetta');
 		}
 		if (String(breach.verified).toLowerCase() === 'no') {
 			meta.push('vahvistamaton');
@@ -281,7 +135,7 @@
 			item.appendChild(node('p', 'breach-details', breach.details));
 		}
 
-		var classes = dataClassList(breach.xposed_data);
+		var classes = BREACH_TERMS.dataClassList(breach.xposed_data);
 		if (classes.length) {
 			var data = node('p', 'breach-data');
 			data.appendChild(node('strong', null, 'Vuotaneet tiedot: '));
@@ -335,7 +189,7 @@
 		box.appendChild(node('h2', null,
 			sorted.length === 1
 				? 'Osoite löytyi yhdestä tietovuodosta'
-				: 'Osoite löytyi ' + formatCount(sorted.length) + ' tietovuodosta'));
+				: 'Osoite löytyi ' + BREACH_TERMS.formatCount(sorted.length) + ' tietovuodosta'));
 
 		var lead = node('p', 'result-lead');
 		lead.appendChild(document.createTextNode('Haettu osoite: '));
@@ -349,11 +203,11 @@
 		box.appendChild(lead);
 
 		var leaked = sorted.filter(function (b) {
-			return dataClassList(b.xposed_data).indexOf('salasanat') !== -1;
+			return BREACH_TERMS.dataClassList(b.xposed_data).indexOf('salasanat') !== -1;
 		}).length;
 		if (leaked) {
 			box.appendChild(node('p', 'result-advice',
-				'Näistä ' + formatCount(leaked) + ' vuodossa paljastui myös salasanoja. ' +
+				'Näistä ' + BREACH_TERMS.formatCount(leaked) + ' vuodossa paljastui myös salasanoja. ' +
 				'Vaihda näiden palveluiden salasanat – ja ennen kaikkea kaikkialta muualta, ' +
 				'missä sama salasana on käytössä.'));
 		}
@@ -448,7 +302,7 @@
 			box.classList.add('is-hit');
 			box.appendChild(node('h2', null, 'Tämä salasana on vuotanut'));
 			box.appendChild(node('p', 'result-lead',
-				'Salasana esiintyy vuototietokannassa ' + formatCount(count) +
+				'Salasana esiintyy vuototietokannassa ' + BREACH_TERMS.formatCount(count) +
 				(count === 1 ? ' kerran.' : ' kertaa.')));
 			box.appendChild(node('p', 'result-advice',
 				'Älä käytä sitä enää missään. Se on murtokoneiden sanakirjoissa, eli se ' +

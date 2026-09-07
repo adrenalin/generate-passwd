@@ -72,6 +72,9 @@
 		<nav class="site-nav" aria-label="Päävalikko">
 			<a href="/">Salasanageneraattori</a>
 			<a href="/vuodot">Vuototarkistus</a>
+			<a href="/tietovuodot">Vuotoluettelo</a>
+			<a href="/vahvuus">Vahvuustesti</a>
+			<a href="/uutiset">Uutiset</a>
 		</nav>
 	</div>
 </header>
@@ -106,6 +109,13 @@
 	<p>
 		Myöskään valintasi – kieli, sanojen määrä, erotin – eivät lähde koneeltasi.
 		Ne vaikuttavat vain siihen, mitä selain laskee.
+	</p>
+	<p>
+		Sama koskee <a href="/vahvuus">vahvuustestiä</a>: siihen kirjoitettu salasana
+		arvioidaan kokonaan selaimessasi. Arviointikirjasto ja sanalistat ladataan tältä
+		samalta sivustolta, eikä sivu ota salasanan takia verkkoyhteyttä lainkaan – ei
+		meille eikä kolmannelle osapuolelle. Voit tarkistaa asian katkaisemalla
+		verkkoyhteyden sivun latauduttua: testi toimii silti.
 	</p>
 
 	<h2 id="vuototarkistus">Vuototarkistus on ainoa poikkeus</h2>
@@ -152,6 +162,34 @@
 		</li>
 	</ul>
 
+	<h2 id="muut-sivut">Vuotoluettelo, vahvuustesti ja uutiset</h2>
+	<p>
+		Sivustolla on kolme muuta sivua, jotka näyttävät ulkopuolista aineistoa. Yksikään
+		niistä ei kysy sinusta mitään eikä vie selaintasi toiselle sivustolle:
+	</p>
+	<ul class="facts">
+		<li>
+			<strong><a href="/tietovuodot">Vuotoluettelo</a> hakee aineiston meidän
+			palvelimemme kautta.</strong> Luettelo on Have I Been Pwnedin ja tilastoluvut
+			XposedOrNotin julkista aineistoa, joka on kaikille sama. Palvelimemme noutaa sen
+			muutaman tunnin välein koko sivuston puolesta ja tarjoilee välimuististaan, joten
+			selaimesi ei ota yhteyttä kumpaankaan palveluun eikä IP-osoitteesi päädy niille.
+			Pyynnössä ei ole mitään sinusta – ei osoitetta, ei tunnistetta, ei hakusanaa.
+			Hakukenttä suodattaa jo ladattua luetteloa selaimessasi.
+		</li>
+		<li>
+			<strong><a href="/vahvuus">Vahvuustesti</a> ei lähetä mitään.</strong> Arvio
+			lasketaan selaimessasi, ja kenttään kirjoitettu salasana pysyy koneellasi.
+		</li>
+		<li>
+			<strong><a href="/uutiset">Uutissivu</a> on tavallista HTML:ää.</strong>
+			Kyberturvallisuuskeskuksen otsikot haetaan julkaisun yhteydessä ja tallennetaan
+			sivulle valmiiksi, joten sivulla ei ole skriptejä, upotuksia eikä jäljityskuvia.
+			Vasta linkin napauttaminen vie sinut heidän sivulleen – ja linkeistä on poistettu
+			syötteen omat seurantaparametrit.
+		</li>
+	</ul>
+
 	<h2 id="kavijamittaus">Kävijämittaus</h2>
 	<p>
 		Sivustolla on kävijämittaus, jotta tiedämme karkeasti kuinka montaa ihmistä palvelu
@@ -176,9 +214,10 @@
 			<strong>Ei ulkopuolisia palvelimia.</strong> Mittauspyynnöt kulkevat tämän saman
 			osoitteen kautta (<code>/stats/</code>), joten mittaus ei vie selaintasi
 			yhdellekään muulle sivustolle. Sivustolla ei ole mainoksia, upotuksia eikä
-			ulkopuolisia skriptejä lainkaan. Ainoa poikkeus koko sivustolla on
-			<a href="#vuototarkistus">vuototarkistus</a>, ja siellä yhteys syntyy vasta kun
-			pyydät tarkistusta itse.
+			ulkopuolisia skriptejä lainkaan. Ainoa kohta, jossa selaimesi ottaa yhteyden
+			ulkopuolelle, on <a href="#vuototarkistus">vuototarkistus</a>, ja siellä yhteys
+			syntyy vasta kun pyydät tarkistusta itse. Muiden sivujen ulkopuolinen aineisto
+			kulkee <a href="#muut-sivut">meidän palvelimemme kautta</a>.
 		</li>
 		<li>
 			<strong>Ei ristiinseurantaa.</strong> Emme yhdistä käyntejäsi muihin palveluihin
