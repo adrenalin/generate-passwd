@@ -74,8 +74,12 @@ ssh -t "$HOST" "set -eu
 	if ! sudo test -d \"/etc/letsencrypt/live/\$site\"; then
 		echo '--> no certificate yet, bootstrapping over HTTP'
 		install_conf \"\$site.bootstrap.nginx\"
+		# --deploy-hook tallentuu uusintakonfiguraatioon, joten myös automaattinen
+		# uusinta lataa nginxin. Ilman sitä certbot kirjoittaa uuden varmenteen
+		# levylle ja nginx tarjoilee vanhaa, kunnes joku sattuu lataamaan sen.
 		sudo certbot certonly --webroot -w \"\$webroot\" \\
 			-d \"\$site\" -d \"www.\$site\" \\
+			--deploy-hook 'systemctl reload nginx' \\
 			--non-interactive --agree-tos --keep-until-expiring
 	fi
 

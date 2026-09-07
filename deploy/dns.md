@@ -15,14 +15,16 @@ is the record of what should be there and how to check it.
 | --- | --- | --- |
 | `salasanasi.fi` | A | `95.216.185.194` (kaktus.cc) |
 | `www.salasanasi.fi` | CNAME | `salasanasi.fi` |
-| `salasanasi.fi` | MX | `0 mail.salasanasi.fi` → CNAME → `mail.vapaaradikaali.fi` |
+| `salasanasi.fi` | MX | `0 mail.vapaaradikaali.fi` |
 | `salasanasi.fi` | TXT | `v=spf1 include:vapaaradikaali.fi -all` |
 | `salasanasi.fi` | TXT | Google site verification |
 | `_dmarc.salasanasi.fi` | TXT | `v=DMARC1; p=quarantine;` |
+| `salasanasi.fi` | CAA | `0 issue "letsencrypt.org"`, `0 issuewild ";"` |
 
-Still missing: `CAA` and `AAAA`. `DNSSEC` is parked — see below.
+Still missing: `AAAA`, and only because there is no address to put in it.
+`DNSSEC` is parked — see below.
 
-## CAA — add this
+## CAA — done 2026-09-07
 
 ```
 salasanasi.fi.	3600	IN	CAA	0 issue "letsencrypt.org"
@@ -37,18 +39,31 @@ covers the `certbot certonly --webroot` renewals this repo relies on. The second
 line forbids wildcard certificates outright — the site uses none, and a wildcard
 is the most valuable thing an attacker could talk a CA into.
 
-Optionally add a contact that CAs will notify about violations:
+`www` needs no record of its own: it is a CNAME to the apex, and CAA resolution
+follows the CNAME to the same two records.
 
-```
-salasanasi.fi.	3600	IN	CAA	0 iodef "mailto:postmaster@vapaaradikaali.fi"
-```
+An `iodef` contact — the address a CA notifies when it refuses an issuance
+request — is deliberately left out, in keeping with the decision not to receive
+mail reports about this domain.
 
-Check afterwards, and confirm renewals still pass:
+Verified after the change, and again whenever the records are touched:
 
 ```sh
-dig +short CAA salasanasi.fi
+dig +short CAA salasanasi.fi @hydrogen.ns.hetzner.com   # authoritative
+dig +short CAA salasanasi.fi @1.1.1.1                   # as resolvers see it
 ssh kaktus.cc sudo certbot renew --dry-run --cert-name salasanasi.fi
 ```
+
+Issuance was re-tested under the new records the same day — a staging dry-run,
+then a forced reissue, both successful. A CA reads CAA at validation time, so a
+typo in these records would fail the *next* renewal, quietly, in December; doing
+one issuance now is what turns that into a problem you would have already seen.
+
+The forced run also installed `renew_hook = systemctl reload nginx` in
+`/etc/letsencrypt/renewal/salasanasi.fi.conf`, which was missing. Without it an
+automatic renewal writes a new certificate and nginx keeps serving the old one
+until something reloads it. `tools/deploy-nginx.sh` now passes the same
+`--deploy-hook` when it bootstraps a certificate on a fresh host.
 
 ## DNSSEC — parked, the DNS host cannot sign
 
@@ -105,16 +120,16 @@ duplicating its addresses, and costs three DNS lookups of the ten SPF allows
 inside the include is not inherited — an `include` can only match, never fail —
 so this record's own `-all` is what rejects everything else, which is correct.
 
-Two small things left in the mail setup, neither urgent:
+The MX was pointing at `mail.salasanasi.fi`, itself a CNAME — which RFC 5321 §5.1
+forbids and strict receivers flag — and now points straight at
+`mail.vapaaradikaali.fi`.
 
-- **The MX points at an alias.** `salasanasi.fi MX → mail.salasanasi.fi`, which is
-  a CNAME to `mail.vapaaradikaali.fi`. RFC 5321 §5.1 says an MX target must not be
-  an alias; most receivers follow the chain anyway, but strict ones and internet.nl
-  flag it. Pointing the MX straight at `mail.vapaaradikaali.fi` is a one-record fix.
-- **No `rua=` in the DMARC record**, so nobody sends aggregate reports and there is
-  no way to see who is sending as this domain or whether real mail is being
-  quarantined. `v=DMARC1; p=quarantine; rua=mailto:postmaster@salasanasi.fi` fixes
-  that; a same-domain address needs no authorisation record at the receiving end.
+**No `rua=` in the DMARC record, by decision.** Aggregate reports would say who is
+sending as this domain and whether legitimate mail is being quarantined, but they
+arrive as mail, daily, from every large receiver; the owner does not want them.
+The policy still applies — `p=quarantine` is enforced by receivers whether or not
+anyone is listening — so this costs visibility, not protection. Don't add `rua`
+back without asking.
 
 ## Noticed while auditing, not done
 
@@ -137,6 +152,6 @@ Two small things left in the mail setup, neither urgent:
 | [securityheaders.com](https://securityheaders.com/?q=https%3A%2F%2Fwww.salasanasi.fi%2F&hide=on&followRedirects=on) | run it in a browser — the site returns 403 to scripted requests |
 | [internet.nl](https://internet.nl/site/www.salasanasi.fi/) | run it in a browser — anonymous single-domain tests are web-only. IPv6 will fail (no address to publish), DNSSEC will fail (Hetzner cannot sign), and mail should now mostly pass on SPF and DMARC |
 
-Certificate: Let's Encrypt, `salasanasi.fi` + `www.salasanasi.fi`, renewed by
-certbot. OCSP is not stapled and that is not a finding — Let's Encrypt has
+Certificate: Let's Encrypt, `salasanasi.fi` + `www.salasanasi.fi`, reissued
+2026-09-07 under the new CAA records and reloaded by the renewal hook. OCSP is not stapled and that is not a finding — Let's Encrypt has
 retired OCSP in favour of CRLs, so there is no response to staple.
