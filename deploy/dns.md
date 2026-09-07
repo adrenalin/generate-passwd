@@ -14,6 +14,7 @@ is the record of what should be there and how to check it.
 | Name | Type | Value |
 | --- | --- | --- |
 | `salasanasi.fi` | A | `95.216.185.194` (kaktus.cc) |
+| `salasanasi.fi` | AAAA | `2a01:4f9:c010:e67a::1` |
 | `www.salasanasi.fi` | CNAME | `salasanasi.fi` |
 | `salasanasi.fi` | MX | `0 mail.vapaaradikaali.fi` |
 | `salasanasi.fi` | TXT | `v=spf1 include:vapaaradikaali.fi -all` |
@@ -21,8 +22,7 @@ is the record of what should be there and how to check it.
 | `_dmarc.salasanasi.fi` | TXT | `v=DMARC1; p=quarantine;` |
 | `salasanasi.fi` | CAA | `0 issue "letsencrypt.org"`, `0 issuewild ";"` |
 
-Still missing: `AAAA` — the server now has an address, see below. `DNSSEC` is
-parked — also below.
+Everything the site needs is now published. `DNSSEC` is parked — see below.
 
 ## CAA — done 2026-09-07
 
@@ -131,7 +131,7 @@ The policy still applies — `p=quarantine` is enforced by receivers whether or 
 anyone is listening — so this costs visibility, not protection. Don't add `rua`
 back without asking.
 
-## IPv6 — host ready 2026-09-07, record still to add
+## IPv6 — done 2026-09-07
 
 kaktus.cc now has `2a01:4f9:c010:e67a::1/64` with a working default route, and
 everything on the server side already answers on it:
@@ -145,7 +145,7 @@ everything on the server side already answers on it:
 | `https://salasanasi.fi/` forced to the v6 address | 301 to www, certificate verifies |
 | `https://www.salasanasi.fi/` forced to the v6 address | 200, certificate verifies |
 
-So only the record is missing:
+The record is published:
 
 ```
 salasanasi.fi.	3600	IN	AAAA	2a01:4f9:c010:e67a::1
@@ -153,22 +153,21 @@ salasanasi.fi.	3600	IN	AAAA	2a01:4f9:c010:e67a::1
 
 `www` needs nothing of its own — it is a CNAME to the apex.
 
-**Re-run the certbot dry-run immediately after adding it.** Let's Encrypt prefers
-IPv6 for the HTTP-01 challenge once an `AAAA` exists. It falls back to IPv4 if
-the v6 connection is refused outright, but a path that accepts the connection and
-then stalls — a cloud firewall dropping packets, say — will not fall back, and
-the failure surfaces at renewal rather than now:
+Inbound v6 from the public internet is confirmed, not assumed: SSL Labs scanned
+the v6 endpoint from `2602:fdaa:c6:2::` (Qualys) and the access log shows the
+`200`. It grades **A+ with no warnings on both address families**, identically.
+
+The certificate was re-tested at the same time, because this is where adding an
+`AAAA` usually goes wrong: Let's Encrypt prefers IPv6 for the HTTP-01 challenge
+once the record exists, and while it falls back to IPv4 on a refused connection,
+a path that accepts and then stalls — a cloud firewall dropping packets — will
+not fall back, and the failure would surface at renewal instead. The dry-run
+passes. Re-run these two after any change to the address or the firewall:
 
 ```sh
 dig +short AAAA salasanasi.fi
 ssh kaktus.cc sudo certbot renew --dry-run --cert-name salasanasi.fi
 ```
-
-What is still unproven is *inbound* v6 from the public internet: the tests above
-were made from the host itself, which does not traverse Hetzner's network, and
-public reachability checkers will not take a bare IPv6 address. Publishing the
-`AAAA` and re-running SSL Labs settles it — it scans every address a name
-resolves to, so a v6 endpoint that is unreachable shows up as a failed endpoint.
 
 The proxied upstreams were checked at the same time, because a host that gains
 v6 egress starts preferring it: `haveibeenpwned.com`, `api.xposedornot.com` and
@@ -187,10 +186,10 @@ all, so the Matomo proxy keeps using IPv4.
 
 | Scan | Result |
 | --- | --- |
-| [Mozilla HTTP Observatory](https://developer.mozilla.org/en-US/observatory/analyze?host=www.salasanasi.fi) | **A+**, score 130, 12/12 passed |
-| [SSL Labs](https://www.ssllabs.com/ssltest/analyze.html?d=www.salasanasi.fi) | **A+**, no warnings, TLS 1.2 + 1.3 only, forward secrecy for every simulated client, X25519MLKEM768 offered |
+| [Mozilla HTTP Observatory](https://developer.mozilla.org/en-US/observatory/analyze?host=www.salasanasi.fi) | **A+**, score 130, 12/12 passed (re-run after IPv6: unchanged) |
+| [SSL Labs](https://www.ssllabs.com/ssltest/analyze.html?d=www.salasanasi.fi) | **A+ on both endpoints**, IPv4 and IPv6, no warnings, TLS 1.2 + 1.3 only, forward secrecy for every simulated client, X25519MLKEM768 offered |
 | [securityheaders.com](https://securityheaders.com/?q=https%3A%2F%2Fwww.salasanasi.fi%2F&hide=on&followRedirects=on) | run it in a browser — the site returns 403 to scripted requests |
-| [internet.nl](https://internet.nl/site/www.salasanasi.fi/) | run it in a browser — anonymous single-domain tests are web-only. IPv6 will fail (no address to publish), DNSSEC will fail (Hetzner cannot sign), and mail should now mostly pass on SPF and DMARC |
+| [internet.nl](https://internet.nl/site/www.salasanasi.fi/) | run it in a browser — anonymous single-domain tests are web-only. IPv6, TLS and the mail policies should now pass; DNSSEC is the one remaining red mark, because Hetzner cannot sign |
 
 Certificate: Let's Encrypt, `salasanasi.fi` + `www.salasanasi.fi`, reissued
 2026-09-07 under the new CAA records and reloaded by the renewal hook. OCSP is not stapled and that is not a finding — Let's Encrypt has
