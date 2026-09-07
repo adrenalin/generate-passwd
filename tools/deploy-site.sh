@@ -1,13 +1,19 @@
 #!/bin/sh
 # SPDX-License-Identifier: LGPL-3.0-or-later
-# Deploy the salasanasi.fi site to the web host.
+# Publish the salasanasi.fi site to the web host.
 #
 #   ./tools/deploy-site.sh [host]
 #
-# Copies web/ plus the wordlists to the web root, installs the nginx site and
-# reloads nginx. On the first run it also obtains a Let's Encrypt certificate:
-# the HTTP-only bootstrap config is installed just long enough for the ACME
-# challenge, then the real HTTPS config replaces it. Idempotent afterwards.
+# Copies web/ plus the wordlists to the document root, installs the news builder
+# and its cron entry, and checks that the nginx configuration on the host still
+# matches the one in deploy/.
+#
+# THIS SCRIPT NEEDS NO ROOT. The document root belongs to the login user, so a
+# routine deploy is an rsync and nothing more — no sudo, passwordless or
+# otherwise. Anything that does need root — the nginx configuration, the
+# certificate, creating the document root in the first place — lives in
+# tools/deploy-nginx.sh, which is run by hand on the rare occasions it changes
+# and may prompt for a sudo password.
 #
 # Copyright (C) 2026 Arttu Manninen.  Licensed under the GNU LGPL v3 or later;
 # see COPYING.LESSER.
@@ -17,12 +23,17 @@ HOST="${1:-${SALASANASI_HOST:-salasanasi.fi}}"
 SITE=salasanasi.fi
 WEBROOT="/var/www/$SITE"
 
+# Marker on the cron line so it can be recognised and replaced without touching
+# whatever else the user keeps in their crontab.
+CRON_MARKER="# salasanasi.fi news"
+
 cd "$(dirname "$0")/.."
 
 # The news page is rendered at build time from the NCSC-FI feed, so /uutiset is
 # plain HTML with no third-party request in the visitor's browser. A stale list
 # beats an empty one: if the feed is unreachable, the committed page is published
-# as it stands and the deploy carries on.
+# as it stands and the deploy carries on. Between deploys the cron job installed
+# below keeps the published page current.
 echo "==> rebuilding /uutiset from the NCSC-FI feed"
 if ! ./tools/build-news.py; then
 	echo "  feed unavailable, publishing the committed web/uutiset.html unchanged" >&2
@@ -68,7 +79,8 @@ cp wordlist-fi.txt wordlist-en.txt "$STAGE/"
 
 # Version the assets by content so they can be cached for a year without a deploy
 # ever serving a stale one. The filenames stay put — only the reference gains a
-# ?v=, which is enough to make it a different cache entry.
+# ?v=, which is enough to make it a different cache entry. tools/build-news.py
+# --assets does the same for the page cron rewrites on the host.
 for asset in style.css app.js analytics.js breach-terms.js vuodot.js tietovuodot.js \
 		vahvuus.js vendor/zxcvbn-core.js vendor/zxcvbn-common.js; do
 	version=$(sha256sum "$STAGE/$asset" | cut -c1-10)
@@ -76,53 +88,72 @@ for asset in style.css app.js analytics.js breach-terms.js vuodot.js tietovuodot
 	echo "    $asset -> ?v=$version"
 done
 
+# The document root must exist and belong to the login user. It is created that
+# way by tools/deploy-nginx.sh; failing here with an instruction beats failing
+# inside rsync with a permission error.
+if ! ssh "$HOST" "test -w '$WEBROOT'"; then
+	echo "$HOST:$WEBROOT is missing or not writable by $(ssh "$HOST" id -un)." >&2
+	echo "Run ./tools/deploy-nginx.sh $HOST once — it creates it and hands it over." >&2
+	exit 1
+fi
+
 echo "==> copying to $HOST:$WEBROOT"
-ssh "$HOST" "sudo install -d -o www-data -g www-data -m 755 $WEBROOT"
 rsync -rlt --delete --chmod=D755,F644 --exclude '.well-known' \
-	-e ssh --rsync-path='sudo rsync' \
-	"$STAGE/" "$HOST:$WEBROOT/"
+	-e ssh "$STAGE/" "$HOST:$WEBROOT/"
 
-echo "==> installing nginx site"
-scp -q "deploy/$SITE.nginx" "deploy/$SITE.bootstrap.nginx" \
-	deploy/salasanasi-shared.conf deploy/salasanasi-matomo-proxy.conf \
-	deploy/salasanasi-headers.conf deploy/salasanasi-headers-vuodot.conf \
-	deploy/salasanasi-data-proxy.conf "$HOST:/tmp/"
+# The headlines would otherwise be as old as the last deploy. The builder runs on
+# the host from cron and writes straight into the document root — which the login
+# user owns, so this needs no root either. The crontab line is rewritten every
+# deploy so a change of schedule or path here reaches the host.
+echo "==> installing the news builder and its cron entry"
+scp -q tools/build-news.py "$HOST:/tmp/salasanasi-build-news.py"
 ssh "$HOST" "set -eu
-	site=$SITE
-	webroot=$WEBROOT
-	sudo install -d -m 755 /var/log/nginx/accesslogs
-	sudo chown -R www-data:www-data \"\$webroot\"
+	mkdir -p \"\$HOME/bin\" \"\$HOME/.local/state\"
+	install -m 755 /tmp/salasanasi-build-news.py \"\$HOME/bin/salasanasi-build-news.py\"
+	rm -f /tmp/salasanasi-build-news.py
 
-	# http-tason vyöhykkeet ja mittausproxyn otsakkeet ensin: vhost viittaa niihin,
-	# joten väärässä järjestyksessä nginx -t kaatuisi.
-	sudo install -o root -g root -m 644 /tmp/salasanasi-shared.conf /etc/nginx/conf.d/salasanasi-shared.conf
-	sudo install -o root -g root -m 644 /tmp/salasanasi-matomo-proxy.conf /etc/nginx/snippets/salasanasi-matomo-proxy.conf
-	sudo install -o root -g root -m 644 /tmp/salasanasi-data-proxy.conf /etc/nginx/snippets/salasanasi-data-proxy.conf
-	sudo install -o root -g root -m 644 /tmp/salasanasi-headers.conf /etc/nginx/snippets/salasanasi-headers.conf
-	sudo install -o root -g root -m 644 /tmp/salasanasi-headers-vuodot.conf /etc/nginx/snippets/salasanasi-headers-vuodot.conf
+	# 06:20 and 16:20 UTC. The Friday review lands about 05:40 UTC, so the morning
+	# run catches it the same day, and the afternoon run picks up anything since.
+	line=\"20 6,16 * * * \$HOME/bin/salasanasi-build-news.py --output $WEBROOT/uutiset.html --assets $WEBROOT >> \$HOME/.local/state/salasanasi-news.log 2>&1 $CRON_MARKER\"
 
-	install_conf() {
-		sudo install -o root -g root -m 644 \"/tmp/\$1\" \"/etc/nginx/sites-available/\$site\"
-		sudo ln -sfn \"/etc/nginx/sites-available/\$site\" \"/etc/nginx/sites-enabled/\$site\"
-		sudo nginx -t
-		sudo systemctl reload nginx
-	}
+	tab=\$(mktemp)
+	crontab -l 2>/dev/null | grep -vF '$CRON_MARKER' > \"\$tab\" || true
+	echo \"\$line\" >> \"\$tab\"
+	crontab \"\$tab\"
+	rm -f \"\$tab\"
+	crontab -l | grep -F '$CRON_MARKER' | sed 's|^|    |'"
 
-	# sudo test: /etc/letsencrypt/live on 0700 rootille, joten tavallinen käyttäjä ei
-	# näe hakemistoa ja tarkistus luulisi varmennetta puuttuvaksi joka ajolla — mikä
-	# pudottaisi HTTPS:n bootstrap-konfiguraation ajaksi jokaisessa julkaisussa.
-	if ! sudo test -d \"/etc/letsencrypt/live/\$site\"; then
-		echo '--> no certificate yet, bootstrapping over HTTP'
-		install_conf \"\$site.bootstrap.nginx\"
-		sudo certbot certonly --webroot -w \"\$webroot\" \\
-			-d \"\$site\" -d \"www.\$site\" \\
-			--non-interactive --agree-tos --keep-until-expiring
+# The nginx configuration is deployed separately and rarely, so it can drift
+# behind the repo without anyone noticing. Compare it here — reading /etc/nginx
+# needs no privileges — and say so rather than silently serving an old config.
+echo "==> checking the nginx configuration on $HOST"
+remote_sums=$(ssh "$HOST" "sha256sum \
+	/etc/nginx/conf.d/salasanasi-shared.conf \
+	/etc/nginx/snippets/salasanasi-headers.conf \
+	/etc/nginx/snippets/salasanasi-headers-vuodot.conf \
+	/etc/nginx/snippets/salasanasi-matomo-proxy.conf \
+	/etc/nginx/snippets/salasanasi-data-proxy.conf \
+	/etc/nginx/sites-available/$SITE 2>/dev/null" || true)
+
+stale=0
+for pair in \
+	"deploy/salasanasi-shared.conf:/etc/nginx/conf.d/salasanasi-shared.conf" \
+	"deploy/salasanasi-headers.conf:/etc/nginx/snippets/salasanasi-headers.conf" \
+	"deploy/salasanasi-headers-vuodot.conf:/etc/nginx/snippets/salasanasi-headers-vuodot.conf" \
+	"deploy/salasanasi-matomo-proxy.conf:/etc/nginx/snippets/salasanasi-matomo-proxy.conf" \
+	"deploy/salasanasi-data-proxy.conf:/etc/nginx/snippets/salasanasi-data-proxy.conf" \
+	"deploy/$SITE.nginx:/etc/nginx/sites-available/$SITE"; do
+	local_file=${pair%%:*}
+	remote_file=${pair#*:}
+	want=$(sha256sum "$local_file" | cut -d' ' -f1)
+	have=$(printf '%s\n' "$remote_sums" | sed -n "s|^\([0-9a-f]*\)  $remote_file\$|\1|p")
+	if [ "$want" != "$have" ]; then
+		echo "  $local_file differs from $remote_file" >&2
+		stale=1
 	fi
-
-	install_conf \"\$site.nginx\"
-	rm -f \"/tmp/\$site.nginx\" \"/tmp/\$site.bootstrap.nginx\" \
-		/tmp/salasanasi-shared.conf /tmp/salasanasi-matomo-proxy.conf \
-		/tmp/salasanasi-data-proxy.conf \
-		/tmp/salasanasi-headers.conf /tmp/salasanasi-headers-vuodot.conf"
+done
+if [ "$stale" -ne 0 ]; then
+	echo "  nginx config on the host is behind the repo — run ./tools/deploy-nginx.sh $HOST" >&2
+fi
 
 echo "==> done: https://www.$SITE/"

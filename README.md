@@ -163,13 +163,34 @@ To publish:
 ./tools/deploy-site.sh other.host
 ```
 
-The script first rebuilds `/uutiset` from the NCSC-FI feed (a failure there is
-not fatal — the committed page ships unchanged), then stages `web/` plus the
-wordlists, rsyncs them to
-`/var/www/salasanasi.fi`, installs the nginx site and reloads. On a host with
+**This needs no root.** The document root belongs to the login user, so a content
+deploy is an rsync: no sudo, passwordless or otherwise. The script rebuilds
+`/uutiset` from the NCSC-FI feed (a failure there is not fatal — the committed
+page ships unchanged), checks the sitemap, stages `web/` plus the wordlists with
+versioned asset references, rsyncs them to `/var/www/salasanasi.fi`, refreshes
+the news cron job, and finally compares the nginx configuration on the host with
+the one in `deploy/` so it cannot drift behind unnoticed.
+
+The half that does need root is separate and rarely run:
+
+```sh
+./tools/deploy-nginx.sh             # may prompt for a sudo password
+```
+
+It creates the document root owned by the login user, installs the http-level
+config, the snippets and the vhost, runs `nginx -t` and reloads. On a host with
 no certificate yet it first installs `deploy/salasanasi.fi.bootstrap.nginx`
 (HTTP only) so certbot can answer the ACME challenge, then swaps in the HTTPS
-config. Re-running it later just updates the files.
+config. Run it after changing anything in `deploy/` — and note that it uses
+`ssh -t`, so an ordinary password-prompting sudo works fine.
+
+`/uutiset` would otherwise be as old as the last deploy, so `deploy-site.sh`
+also installs `tools/build-news.py` as `~/bin/salasanasi-build-news.py` on the
+host and a crontab line that runs it at 06:20 and 16:20 UTC, writing straight
+into the document root (`--assets` there stamps the same `?v=` hashes the deploy
+uses, so a cron-built page cannot pin a stale stylesheet). The line is marked
+`# salasanasi.fi news` and is rewritten on every deploy, so the schedule lives
+in this repo and nowhere else.
 
 ## Tests
 

@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: LGPL-3.0-or-later
 # Build web/uutiset.html from the NCSC-FI news feed.
 #
-#   ./tools/build-news.py [--items N] [--output PATH]
+#   ./tools/build-news.py [--items N] [--output PATH] [--assets DIR]
 #
 # Kyberturvallisuuskeskus (Traficom) publishes its news as a public RSS feed. The
 # page is rendered here, at build time, rather than fetched by the visitor's
@@ -15,10 +15,18 @@
 # feed is unreachable, the committed page is published as-is rather than a broken
 # or empty one.
 #
+# The same script also runs from cron on the web host twice a day, writing
+# straight into the document root so the headlines stay current between deploys.
+# That run needs --assets, which stamps the ?v=<hash> on the stylesheet and script
+# references the way the deploy does: css and js are served with a one-year
+# immutable Cache-Control, so a page that referenced them unversioned could pin a
+# stale stylesheet in a visitor's cache for a year.
+#
 # Copyright (C) 2026 Arttu Manninen.  Licensed under the GNU LGPL v3 or later;
 # see COPYING.LESSER.
 
 import argparse
+import hashlib
 import html
 import re
 import sys
@@ -70,6 +78,20 @@ def clean_link(url):
         if part and not part.split("=", 1)[0].startswith(("mtm_", "utm_"))
     ]
     return base + ("?" + "&".join(kept) if kept else "")
+
+
+# Same scheme as tools/deploy-site.sh: the first ten characters of the file's
+# SHA-256, appended to the reference only. An asset that is missing from the
+# directory is left alone rather than guessed at.
+def version_assets(page, directory):
+    for asset in ("style.css", "analytics.js"):
+        source = Path(directory) / asset
+        if not source.is_file():
+            print(f"build-news: {source} not found, leaving /{asset} unversioned", file=sys.stderr)
+            continue
+        digest = hashlib.sha256(source.read_bytes()).hexdigest()[:10]
+        page = page.replace(f'"/{asset}"', f'"/{asset}?v={digest}"')
+    return page
 
 
 def fetch(url):
@@ -310,6 +332,9 @@ def main():
     parser.add_argument("--items", type=int, default=12, help="how many headlines to show")
     parser.add_argument("--output", default="web/uutiset.html", help="where to write the page")
     parser.add_argument("--feed", default=FEED_URL, help="feed URL to read")
+    parser.add_argument("--assets", metavar="DIR",
+                        help="stamp ?v=<hash> on style.css and analytics.js from this directory "
+                             "(the document root); for the cron run on the web host")
     args = parser.parse_args()
 
     try:
@@ -325,6 +350,9 @@ def main():
         built_iso=built.date().isoformat(),
         source_url=SOURCE_URL,
     )
+
+    if args.assets:
+        page = version_assets(page, args.assets)
 
     Path(args.output).write_text(page, encoding="utf-8")
     print(f"build-news: wrote {args.output} with {len(items)} headlines")
