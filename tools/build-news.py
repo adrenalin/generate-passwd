@@ -166,16 +166,16 @@ PAGE = """<!doctype html>
 <meta property="og:url" content="https://www.salasanasi.fi/uutiset">
 <meta property="og:title" content="Tietoturvauutiset – salasanasi.fi">
 <meta property="og:description" content="Kyberturvallisuuskeskuksen tuoreimmat tiedotteet ja varoitukset koottuna. Huijaukset, tietomurrot ja haavoittuvuudet, jotka koskevat Suomea.">
-<meta property="og:image" content="https://www.salasanasi.fi/salasanasi.fi.jpg">
+<meta property="og:image" content="https://www.salasanasi.fi/images/og-uutiset.jpg">
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="salasanasi.fi – Vahvoja salasanoja suomen kielen sanoista">
+<meta property="og:image:alt" content="salasanasi.fi – Huijaukset, tietomurrot ja haavoittuvuudet">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Tietoturvauutiset – salasanasi.fi">
 <meta name="twitter:description" content="Kyberturvallisuuskeskuksen tuoreimmat tiedotteet ja varoitukset koottuna. Huijaukset, tietomurrot ja haavoittuvuudet, jotka koskevat Suomea.">
-<meta name="twitter:image" content="https://www.salasanasi.fi/salasanasi.fi.jpg">
-<meta name="twitter:image:alt" content="salasanasi.fi – Vahvoja salasanoja suomen kielen sanoista">
+<meta name="twitter:image" content="https://www.salasanasi.fi/images/og-uutiset.jpg">
+<meta name="twitter:image:alt" content="salasanasi.fi – Huijaukset, tietomurrot ja haavoittuvuudet">
 <link rel="canonical" href="https://www.salasanasi.fi/uutiset">
 <link rel="preload" href="/fonts/source-sans-3-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/source-sans-3-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
