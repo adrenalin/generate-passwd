@@ -93,6 +93,25 @@ server {
 		expires 7d;
 	}
 
+	# ── Vuototarkistus ───────────────────────────────────────────────
+	# Sivuston ainoa sivu, joka ottaa yhteyden ulos: sähköpostiosoitteen vuotohaku
+	# XposedOrNotilta ja salasanan k-anonymiteettihaku Have I Been Pwnediltä. Molemmat
+	# kutsutaan selaimesta suoraan, ei tämän palvelimen kautta — silloin osoite ei voi
+	# päätyä näihin lokeihin, ja XposedOrNotin IP-kohtainen ilmaiskiintiö (100 kyselyä
+	# vuorokaudessa) on kävijäkohtainen eikä koko sivuston yhteinen.
+	#
+	# Tarkka (=) osuma voittaa alla olevan /-etuliitteen, joten löysempi connect-src
+	# koskee vain tätä yhtä sivua. /vuodot.js jää tarkoituksella regex-lohkon hoteisiin
+	# eli saa saman välimuistituksen kuin muutkin skriptit.
+	location = /vuodot {
+		include snippets/salasanasi-headers-vuodot.conf;
+		try_files $uri $uri.html =404;
+	}
+
+	location = /vuodot.html {
+		include snippets/salasanasi-headers-vuodot.conf;
+	}
+
 	# ── Kävijämittauksen proxy ───────────────────────────────────────
 	# Mittaus ei saa ylittää sivuston rajaa. Matomo on openmat.fi:llä, ja tavallinen
 	# seurantapätkä hakisi skriptin sieltä ja raportoisi sinne suoraan selaimesta —

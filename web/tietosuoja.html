@@ -38,7 +38,7 @@
   "name": "Tietosuojaseloste",
   "description": "Mitä salasanasi.fi kerää ja mitä ei: salasanat eivät poistu selaimestasi, kävijämittaus on evästeetöntä ja IP-osoitteet peitetään.",
   "inLanguage": "fi-FI",
-  "dateModified": "2026-09-04",
+  "dateModified": "2026-09-07",
   "isPartOf": {
     "@id": "https://www.salasanasi.fi/#website"
   },
@@ -103,6 +103,50 @@
 		Ne vaikuttavat vain siihen, mitä selain laskee.
 	</p>
 
+	<h2 id="vuototarkistus">Vuototarkistus on ainoa poikkeus</h2>
+	<p>
+		Sivustolla on erillinen <a href="/vuodot">vuototarkistussivu</a>, jolla voi kysyä,
+		esiintyykö sähköpostiosoite tunnetuissa tietovuodoissa tai salasana vuotaneiden
+		salasanojen listalla. Se on koko sivuston ainoa kohta, jossa jotain lähtee
+		selaimestasi ulos, joten se kerrotaan tässä täsmällisesti. Muilla sivuilla mikään
+		yllä kuvattu ei muutu.
+	</p>
+	<ul class="facts">
+		<li>
+			<strong>Sähköpostiosoite lähetetään sellaisenaan</strong>
+			<a href="https://xposedornot.com/">XposedOrNot</a>-palveluun
+			(<code>api.xposedornot.com</code>), joka ylläpitää vuototietokantaa. Osoitetta ei
+			voi peittää tiivisteellä ja saada silti vastausta, joten tämä on tarkistuksen
+			hinta. Kysely tehdään vain, kun painat itse <em>Tarkista</em>.
+		</li>
+		<li>
+			<strong>Salasanaa ei lähetetä.</strong> Selain laskee siitä SHA-1-tiivisteen ja
+			lähettää <a href="https://haveibeenpwned.com/Passwords">Have I Been Pwned</a>
+			-palveluun vain sen viisi ensimmäistä merkkiä. Vastauksena tulee satoja
+			tiivisteitä, joista selain etsii osuman itse, eikä palvelu voi päätellä mitä
+			salasanaa tarkistit.
+		</li>
+		<li>
+			<strong>Kumpikaan kysely ei kulje meidän palvelimemme kautta.</strong> Selain
+			puhuu suoraan näiden palveluiden kanssa. Emme siis näe osoitettasi emmekä
+			salasanaasi, emme voi tallentaa niitä emmekä kirjata niitä lokiin – emme edes
+			vahingossa. Tämä on tietoinen ratkaisu: lupaus ei nojaa siihen, että meidän
+			lokiasetuksemme pysyvät oikeina.
+		</li>
+		<li>
+			<strong>Vastapainoksi nämä palvelut näkevät IP-osoitteesi</strong> kyselyn
+			mukana, kuten mikä tahansa sivusto, jolla käyt. Se, mitä ne tiedolla tekevät,
+			määräytyy niiden omien ehtojen mukaan – emme voi luvata sitä puolestasi.
+			Vuototarkistus on täysin vapaaehtoinen: jos et käytä sivua, mitään ei lähde.
+		</li>
+		<li>
+			<strong>Kävijämittaukseen kirjautuu vain sivun osoite</strong>
+			(<code>/vuodot</code>) samalla tavalla kuin mikä tahansa muukin sivu – ei se,
+			mitä kenttään kirjoitettiin. Kenttien sisältöä ei lähetetä mittaukseen
+			missään muodossa.
+		</li>
+	</ul>
+
 	<h2 id="kavijamittaus">Kävijämittaus</h2>
 	<p>
 		Sivustolla on kävijämittaus, jotta tiedämme karkeasti kuinka montaa ihmistä palvelu
@@ -125,9 +169,11 @@
 		</li>
 		<li>
 			<strong>Ei ulkopuolisia palvelimia.</strong> Mittauspyynnöt kulkevat tämän saman
-			osoitteen kautta (<code>/stats/</code>), joten selaimesi ei ota yhteyttä
-			yhteenkään muuhun sivustoon. Sivulla ei ole mainoksia, upotuksia eikä
-			ulkopuolisia skriptejä lainkaan.
+			osoitteen kautta (<code>/stats/</code>), joten mittaus ei vie selaintasi
+			yhdellekään muulle sivustolle. Sivustolla ei ole mainoksia, upotuksia eikä
+			ulkopuolisia skriptejä lainkaan. Ainoa poikkeus koko sivustolla on
+			<a href="#vuototarkistus">vuototarkistus</a>, ja siellä yhteys syntyy vasta kun
+			pyydät tarkistusta itse.
 		</li>
 		<li>
 			<strong>Ei ristiinseurantaa.</strong> Emme yhdistä käyntejäsi muihin palveluihin
@@ -167,8 +213,11 @@
 		henkilörekisteriä. Anonymisoituja tilastotietoja säilytetään toistaiseksi.
 	</p>
 	<p>
-		Emme kerää nimiä, sähköpostiosoitteita, tunnuksia emmekä maksutietoja. Palvelussa ei
-		ole kirjautumista eikä lomakkeita.
+		Emme kerää nimiä, tunnuksia emmekä maksutietoja, eikä palvelussa ole kirjautumista.
+		<a href="#vuototarkistus">Vuototarkistuksen</a> kentät ovat sivuston ainoat
+		lomakkeet, eikä niihin kirjoitettu sähköpostiosoite tai salasana päädy meille
+		lainkaan: selain lähettää kyselyn suoraan vuototietokantaa ylläpitävälle
+		palvelulle, ohi meidän palvelimemme.
 	</p>
 
 	<h2 id="oikeudet">Oikeutesi</h2>
@@ -189,7 +238,7 @@
 	<p>
 		Jos selosteen sisältö muuttuu, muutos näkyy sivuston
 		<a href="https://github.com/adrenalin/generate-passwd">julkisessa lähdekoodissa</a>
-		versiohistoriana. Seloste on päivitetty 4.9.2026.
+		versiohistoriana. Seloste on päivitetty 7.9.2026.
 	</p>
 </section>
 

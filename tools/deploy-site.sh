@@ -22,9 +22,19 @@ cd "$(dirname "$0")/.."
 # Every page must be listed in the sitemap. The canonical URL comes from the page
 # itself, so this catches both a page missing from the sitemap and a page with no
 # canonical link at all.
+#
+# The one exemption is a page that declares <meta name="robots" content="noindex">.
+# Listing a noindex page in the sitemap tells crawlers to index it and not to index
+# it in the same breath, so the rule is really "every indexable page belongs in the
+# sitemap". A shadow page opts out by being noindex, and the moment that meta tag
+# goes, this check demands the sitemap entry again.
 echo "==> checking sitemap covers every page"
 missing=0
 for page in web/*.html; do
+	if grep -qi '<meta name="robots"[^>]*noindex' "$page"; then
+		echo "  $page is noindex, not expected in the sitemap"
+		continue
+	fi
 	url=$(sed -n 's|.*<link rel="canonical" href="\([^"]*\)".*|\1|p' "$page" | head -1)
 	if [ -z "$url" ]; then
 		echo "  $page has no <link rel=\"canonical\">" >&2
@@ -50,7 +60,7 @@ cp wordlist-fi.txt wordlist-en.txt "$STAGE/"
 # Version the assets by content so they can be cached for a year without a deploy
 # ever serving a stale one. The filenames stay put — only the reference gains a
 # ?v=, which is enough to make it a different cache entry.
-for asset in style.css app.js analytics.js; do
+for asset in style.css app.js analytics.js vuodot.js; do
 	version=$(sha256sum "$STAGE/$asset" | cut -c1-10)
 	sed -i "s|\"/$asset\"|\"/$asset?v=$version\"|g" "$STAGE"/*.html
 	echo "    $asset -> ?v=$version"
@@ -65,7 +75,7 @@ rsync -rlt --delete --chmod=D755,F644 --exclude '.well-known' \
 echo "==> installing nginx site"
 scp -q "deploy/$SITE.nginx" "deploy/$SITE.bootstrap.nginx" \
 	deploy/salasanasi-shared.conf deploy/salasanasi-matomo-proxy.conf \
-	deploy/salasanasi-headers.conf "$HOST:/tmp/"
+	deploy/salasanasi-headers.conf deploy/salasanasi-headers-vuodot.conf "$HOST:/tmp/"
 ssh "$HOST" "set -eu
 	site=$SITE
 	webroot=$WEBROOT
@@ -77,6 +87,7 @@ ssh "$HOST" "set -eu
 	sudo install -o root -g root -m 644 /tmp/salasanasi-shared.conf /etc/nginx/conf.d/salasanasi-shared.conf
 	sudo install -o root -g root -m 644 /tmp/salasanasi-matomo-proxy.conf /etc/nginx/snippets/salasanasi-matomo-proxy.conf
 	sudo install -o root -g root -m 644 /tmp/salasanasi-headers.conf /etc/nginx/snippets/salasanasi-headers.conf
+	sudo install -o root -g root -m 644 /tmp/salasanasi-headers-vuodot.conf /etc/nginx/snippets/salasanasi-headers-vuodot.conf
 
 	install_conf() {
 		sudo install -o root -g root -m 644 \"/tmp/\$1\" \"/etc/nginx/sites-available/\$site\"
@@ -98,6 +109,7 @@ ssh "$HOST" "set -eu
 
 	install_conf \"\$site.nginx\"
 	rm -f \"/tmp/\$site.nginx\" \"/tmp/\$site.bootstrap.nginx\" \
-		/tmp/salasanasi-shared.conf /tmp/salasanasi-matomo-proxy.conf /tmp/salasanasi-headers.conf"
+		/tmp/salasanasi-shared.conf /tmp/salasanasi-matomo-proxy.conf \
+		/tmp/salasanasi-headers.conf /tmp/salasanasi-headers-vuodot.conf"
 
 echo "==> done: https://www.$SITE/"

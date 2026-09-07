@@ -414,3 +414,124 @@ pre code { background: none; border: 0; padding: 0; font-size: 0.9375rem; line-h
 	color: var(--accent);
 	font-weight: 600;
 }
+
+/* ---- vuototarkistus (/vuodot) ---- */
+
+.prose h3 {
+	font-size: 1.1875rem;
+	margin: 1.75rem 0 0.6rem;
+}
+
+.check-lead { margin: 0 0 1.25rem; max-width: 44rem; color: var(--ink-soft); }
+
+.check-form label {
+	display: block;
+	font-size: 1rem;
+	font-weight: 600;
+	margin-bottom: 0.35rem;
+}
+
+.check-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.6rem;
+	align-items: stretch;
+}
+
+.check-row input {
+	flex: 1 1 18rem;
+	min-width: 0;
+	font: 400 1.0625rem var(--sans);
+	color: var(--ink);
+	padding: 0.6rem 0.7rem;
+	background: var(--white);
+	border: 1px solid var(--ink-soft);
+	border-radius: var(--radius);
+}
+.check-row input[type="password"] { font-family: var(--mono); letter-spacing: 0.04em; }
+.check-row input:disabled { background: var(--grey-soft); color: var(--ink-soft); }
+.check-row .primary { flex: none; }
+.check-row .primary:disabled { background: var(--ink-soft); border-color: var(--ink-soft); cursor: default; }
+.check-row .copy { flex: none; }
+
+/* Selostus siitä, mitä lähtee ja minne. Kuuluu lomakkeen viereen eikä alaviitteeseen:
+   se on ainoa kohta koko sivustolla, jossa jotain lähtee ulos selaimesta. */
+.notice {
+	margin: 1.25rem 0 0;
+	padding: 0.9rem 1.1rem;
+	background: var(--pale);
+	border-left: 4px solid var(--highlight);
+	border-radius: var(--radius);
+	font-size: 1rem;
+	line-height: 1.55;
+	max-width: 44rem;
+}
+.notice code { background: var(--white); }
+
+/* ---- tulos ---- */
+
+.result {
+	margin-top: 1.5rem;
+	padding: 1.25rem 1.4rem;
+	border: 1px solid var(--line);
+	border-top: 4px solid var(--line);
+	border-radius: var(--radius);
+	background: var(--pale-soft);
+}
+.result.is-clean { border-top-color: var(--success); }
+.result.is-hit { border-top-color: var(--alert); }
+
+.result h2 { font-size: 1.375rem; margin: 0 0 0.65rem; }
+.result.is-clean h2 { color: var(--success); }
+.result.is-hit h2 { color: var(--alert); }
+
+.result p { margin: 0 0 0.75rem; max-width: 44rem; }
+.result p:last-child { margin-bottom: 0; }
+.result-advice { font-weight: 600; }
+.result-source { font-size: 0.9375rem; color: var(--ink-soft); }
+
+/* ---- vuotoluettelo ---- */
+
+.breaches {
+	list-style: none;
+	margin: 1.25rem 0;
+	padding: 0;
+	display: grid;
+	gap: 0.75rem;
+}
+
+.breaches li {
+	background: var(--white);
+	border: 1px solid var(--line);
+	border-radius: var(--radius);
+	padding: 0.9rem 1.1rem;
+}
+
+.breach-head {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 0.5rem 1rem;
+}
+.breach-head h3 { font-size: 1.125rem; margin: 0; }
+.breach-year {
+	font-size: 0.9375rem;
+	font-variant-numeric: tabular-nums;
+	color: var(--ink-soft);
+	flex: none;
+}
+
+.breaches p { margin: 0.35rem 0 0; font-size: 1rem; line-height: 1.55; max-width: 44rem; }
+.breach-meta { color: var(--ink-soft); font-size: 0.9375rem !important; }
+.breach-data strong { font-weight: 600; }
+.breach-risk { color: var(--ink-soft); }
+.breach-risk.is-bad { color: var(--alert); font-weight: 600; }
+.breach-ref a { font-size: 0.9375rem; }
+
+@media (max-width: 40rem) {
+	.check-row .primary,
+	.check-row .copy { flex: 1 1 auto; }
+	.result { padding: 1rem 1.1rem; }
+	.notice { padding: 0.8rem 0.9rem; }
+}

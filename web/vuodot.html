@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Onko tietosi vuotanut? – salasanasi.fi</title>
+<meta name="description" content="Tarkista, onko sähköpostiosoitteesi tunnetuissa tietovuodoissa tai salasanasi vuotaneiden salasanojen listalla.">
+<!-- Varjosivu: ei vielä navigaatiossa eikä sitemapissa. Tämä rivi on myös se,
+     jonka perusteella tools/deploy-site.sh sallii sivun puuttumisen sitemapista. -->
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#2a6ebb">
+<link rel="canonical" href="https://www.salasanasi.fi/vuodot">
+<link rel="preload" href="/fonts/source-sans-3-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/source-sans-3-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/style.css">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<script src="/vuodot.js" defer></script>
+<script src="/analytics.js" defer></script>
+</head>
+<body>
+
+<header class="site-header">
+	<div class="bar">
+		<a class="wordmark" href="/">
+			<svg class="mark" viewBox="0 0 32 32" width="32" height="32" aria-hidden="true" focusable="false">
+				<rect width="32" height="32" rx="2" fill="#00357a"/>
+				<path d="M11 14v-3a5 5 0 0 1 10 0v3" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
+				<rect x="8" y="14" width="16" height="12" rx="1.5" fill="#fff"/>
+				<circle cx="12.5" cy="20" r="1.5" fill="#00357a"/>
+				<circle cx="16" cy="20" r="1.5" fill="#00357a"/>
+				<circle cx="19.5" cy="20" r="1.5" fill="#00357a"/>
+			</svg>
+			<span class="name">salasanasi<span class="tld">.fi</span></span>
+		</a>
+	</div>
+</header>
+
+<div class="hero">
+	<div class="hero-inner">
+		<h1 class="hero-title">Onko tietosi vuotanut?</h1>
+		<p class="hero-lead">
+			Tarkista, löytyykö sähköpostiosoitteesi tunnetuista tietovuodoista – tai onko
+			salasanasi vuotaneiden salasanojen listalla.
+		</p>
+	</div>
+</div>
+
+<main>
+
+<section class="generator" aria-label="Vuototarkistus">
+	<div class="modes" role="radiogroup" aria-label="Mitä tarkistetaan">
+		<button type="button" class="mode is-active" data-mode="email" role="radio" aria-checked="true">Sähköpostiosoite</button>
+		<button type="button" class="mode" data-mode="password" role="radio" aria-checked="false">Salasana</button>
+	</div>
+
+	<!-- Sähköposti -->
+	<div class="check" data-check="email">
+		<p class="check-lead">
+			Kertoo, missä tunnetuissa tietomurroissa tämä osoite esiintyy ja mitä tietoja
+			kussakin vuodossa paljastui.
+		</p>
+
+		<form id="email-form" class="check-form">
+			<label for="email">Sähköpostiosoite</label>
+			<div class="check-row">
+				<input type="email" id="email" name="email" autocomplete="email"
+					spellcheck="false" autocapitalize="off"
+					placeholder="matti.meikalainen@example.fi" required>
+				<button type="submit" class="primary" id="email-submit">Tarkista</button>
+			</div>
+		</form>
+
+		<p class="notice">
+			<strong>Osoite lähetetään selaimestasi suoraan XposedOrNot-palveluun</strong>
+			(<code>api.xposedornot.com</code>), joka ylläpitää vuototietokantaa. Ilman sitä
+			kysymykseen ei voi vastata. Osoite ei kulje salasanasi.fi:n palvelimen kautta
+			eikä päädy meidän lokeihimme – emme näe sitä lainkaan. Tarkista vain oma
+			osoitteesi. <a href="#mita-lahetetaan">Tarkemmin alla.</a>
+		</p>
+	</div>
+
+	<!-- Salasana -->
+	<div class="check" data-check="password" hidden>
+		<p class="check-lead">
+			Kertoo, esiintyykö tämä salasana vuotaneiden salasanojen listalla – ja kuinka
+			monta kertaa. Jos esiintyy, se on murtokoneiden sanakirjoissa eikä kelpaa
+			salasanaksi enää missään, olipa se kuinka monimutkainen tahansa.
+		</p>
+
+		<form id="password-form" class="check-form">
+			<label for="password">Salasana</label>
+			<div class="check-row">
+				<input type="password" id="password" name="password" autocomplete="off"
+					spellcheck="false" autocapitalize="off" autocorrect="off" required>
+				<button type="button" class="copy" id="password-reveal" aria-pressed="false">Näytä</button>
+				<button type="submit" class="primary" id="password-submit">Tarkista</button>
+			</div>
+		</form>
+
+		<p class="notice">
+			<strong>Salasanaa ei lähetetä minnekään.</strong> Selain laskee siitä
+			SHA-1-tiivisteen ja lähettää siitä vain <strong>viisi ensimmäistä merkkiä</strong>
+			Have I Been Pwned -palveluun. Vastauksena tulee satoja tiivisteitä, joista
+			selaimesi etsii osuman itse. Palvelu ei siis voi tietää, mitä salasanaa
+			tarkistit. <a href="#mita-lahetetaan">Tarkemmin alla.</a>
+		</p>
+	</div>
+
+	<p class="status" id="status" role="status"></p>
+	<div id="result" aria-live="polite"></div>
+</section>
+
+<noscript>
+	<section class="prose">
+		<p class="notice">Tarkistus vaatii JavaScriptin: kyselyt tehdään selaimessasi.</p>
+	</section>
+</noscript>
+
+<section class="prose">
+
+	<h2 id="mita-lahetetaan">Mitä lähetetään ja minne</h2>
+	<p>
+		Tämä sivu on poikkeus sivuston muuten ehdottomaan sääntöön. Salasanageneraattori
+		toimii kokonaan selaimessasi eikä lähetä mitään minnekään. Vuototarkistus ei voi
+		toimia niin: kysymykseen <em>“onko tämä osoite vuotanut”</em> vastaa vain se, jolla on
+		vuototietokanta hallussaan. Siksi kerromme tarkalleen, mitä lähtee ja kenelle.
+	</p>
+
+	<h3>Sähköpostiosoitteen tarkistus</h3>
+	<ul class="facts">
+		<li>
+			<strong>Kirjoittamasi osoite lähetetään sellaisenaan</strong> osoitteeseen
+			<code>api.xposedornot.com</code>. Sitä ei voi peittää tiivisteellä niin, että
+			vastaus olisi vielä käyttökelpoinen.
+		</li>
+		<li>
+			<strong>Selaimesi puhuu suoraan XposedOrNotin kanssa.</strong> Kysely ei kulje
+			salasanasi.fi:n palvelimen kautta. Se tarkoittaa kahta asiaa: me emme näe
+			osoitettasi emmekä voi kirjata sitä lokiin, mutta XposedOrNot näkee kyselyn
+			mukana selaimesi IP-osoitteen – aivan kuten mikä tahansa sivusto, jolla käyt.
+		</li>
+		<li>
+			<strong>Emme tallenna kyselyä.</strong> Emme voi: tieto ei käy palvelimellamme.
+			Kävijämittaukseen kirjautuu vain se, että tällä sivulla on käyty – ei se, mitä
+			siihen kirjoitettiin. Katso <a href="/tietosuoja">tietosuojaseloste</a>.
+		</li>
+		<li>
+			<strong>Mitä XposedOrNot tekee osoitteella,</strong> on heidän
+			<a href="https://xposedornot.com/privacy">tietosuojakäytäntönsä</a> asia, ei
+			meidän. He kertovat, ettei hakuja tallenneta tunnistettavassa muodossa. Emme voi
+			todentaa sitä puolestasi.
+		</li>
+		<li>
+			<strong>Tarkista vain oma osoitteesi.</strong> Palvelu ei varmista, että osoite
+			on sinun, joten kuka tahansa voi kysyä kenen tahansa osoitteesta. Toisen ihmisen
+			osoitteen tarkistaminen kertoo hänestä jotain, mitä hän ei ole sinulle kertonut.
+		</li>
+	</ul>
+
+	<h3>Salasanan tarkistus</h3>
+	<ul class="facts">
+		<li>
+			<strong>Salasana ei poistu selaimestasi.</strong> Selain laskee siitä
+			SHA-1-tiivisteen <code>crypto.subtle.digest()</code>-funktiolla ja lähettää
+			palvelulle vain sen viisi ensimmäistä merkkiä, esimerkiksi <code>5BAA6</code>.
+		</li>
+		<li>
+			<strong>Palvelu vastaa 800–1000 tiivisteellä,</strong> jotka alkavat samoilla
+			viidellä merkillä. Selaimesi etsii niistä osuman itse. Menetelmä on nimeltään
+			<em>k-anonymiteetti</em>: vastauksen saaja ei voi päätellä, mikä niistä oli sinun
+			– eikä edes sitä, löytyikö osumaa.
+		</li>
+		<li>
+			<strong>Vastaus täytetään satunnaisilla riveillä</strong> (<code>Add-Padding</code>),
+			jotta vastauksen kokokaan ei paljasta mitään.
+		</li>
+		<li>
+			<strong>Tarkistettua salasanaa ei pidä käyttää enää missään,</strong> jos se
+			löytyi. Vaihda se, ja jos sama salasana on käytössä muualla, vaihda sekin.
+			<a href="/">Arvo uusi tällä sivustolla.</a>
+		</li>
+	</ul>
+
+	<h2 id="mita-tulos-tarkoittaa">Mitä tulos tarkoittaa</h2>
+	<p>
+		<strong>Osoite löytyi vuodoista.</strong> Tämä on tavallista eikä sinänsä hätätilanne
+		– suurin osa vuosia käytössä olleista osoitteista löytyy jostain. Se tarkoittaa, että
+		jokin palvelu, johon olet joskus rekisteröitynyt, on murrettu. Tärkeää on, <em>mitä</em>
+		kussakin vuodossa paljastui. Jos listalla lukee <em>salasanat</em>, vaihda sen palvelun
+		salasana – ja ennen kaikkea kaikkialta muualta, missä sama salasana on käytössä.
+	</p>
+	<p>
+		<strong>Osoitetta ei löytynyt.</strong> Se ei ole todistus siitä, ettei tietojasi ole
+		vuotanut. Se tarkoittaa vain, ettei osoite ole tässä tietokannassa. Kaikkia vuotoja ei
+		havaita, kaikkia ei julkaista, eikä yksikään tietokanta kata niitä kaikkia.
+	</p>
+	<p>
+		<strong>Salasana löytyi.</strong> Silloin se on jo vuotanut jossain ja on
+		murtokoneiden listoilla. Kokeilukertojen määrä kertoo, kuinka monessa vuodossa se on
+		esiintynyt – mitä suurempi luku, sitä aikaisemmin se kokeillaan. Vaihda se.
+	</p>
+	<p>
+		Kaikissa tapauksissa parhaat toimenpiteet ovat samat: jokaiseen palveluun oma
+		arvottu salasana, salasanojen hallintaohjelma muistamaan ne, ja kaksivaiheinen
+		tunnistautuminen kaikkialle, missä se on tarjolla. Nämä on käyty läpi
+		<a href="/#salasanojen-hallinta">etusivulla</a>.
+	</p>
+
+	<h2 id="mista-tiedot">Mistä tiedot tulevat</h2>
+	<p>
+		Emme ylläpidä omaa vuototietokantaa emmekä säilytä vuotanutta tietoa. Sivu kysyy
+		kahdelta palvelulta, jotka sitä ylläpitävät:
+	</p>
+	<ul class="facts">
+		<li>
+			<strong>Sähköpostiosoitteet:</strong> vuototiedot tarjoaa
+			<a href="https://xposedornot.com/">XposedOrNot</a>, ja ne näytetään heidän
+			käyttöehtojensa edellyttämällä lähdemerkinnällä. Vuotojen kuvaukset,
+			tietoluokat ja lähdelinkit ovat heidän aineistoaan.
+		</li>
+		<li>
+			<strong>Salasanat:</strong> tarkistus käyttää
+			<a href="https://haveibeenpwned.com/Passwords">Have I Been Pwned – Pwned
+			Passwords</a> -palvelua (Troy Hunt). Palvelu on maksuton eikä vaadi
+			lähdemerkintää, mutta se kuuluu mainita.
+		</li>
+	</ul>
+	<p class="note">
+		Kumpikaan palvelu ei ole yhteydessä Vapaaradikaaliin emmekä vastaa niiden
+		toiminnasta, saatavuudesta tai tietojen oikeellisuudesta. Tarkistus on ilmainen ja
+		siinä on käyttömäärärajat: jos vastaus kertoo rajan täyttyneen, odota tunti.
+	</p>
+
+</section>
+
+</main>
+
+<footer class="site-footer">
+	<div class="footer-inner">
+		<p>
+			<a href="/">Takaisin salasanageneraattoriin</a> ·
+			<a href="https://github.com/adrenalin/generate-passwd">Lähdekoodi GitHubissa</a> ·
+			GNU LGPL v3 tai uudempi
+		</p>
+		<p class="fine">
+			Palvelun tarjoaa <a href="https://www.vapaaradikaali.fi">Vapaaradikaali</a>, Y-tunnus 2302852-4.
+			<a href="/tietosuoja">Tietosuojaseloste</a>.
+		</p>
+		<p class="fine">
+			Vuototiedot sähköpostiosoitteille © <a href="https://xposedornot.com/">XposedOrNot</a> ·
+			salasanatarkistus <a href="https://haveibeenpwned.com/Passwords">Have I Been Pwned</a>
+		</p>
+	</div>
+</footer>
+
+</body>
+</html>
