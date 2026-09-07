@@ -21,8 +21,8 @@ is the record of what should be there and how to check it.
 | `_dmarc.salasanasi.fi` | TXT | `v=DMARC1; p=quarantine;` |
 | `salasanasi.fi` | CAA | `0 issue "letsencrypt.org"`, `0 issuewild ";"` |
 
-Still missing: `AAAA`, and only because there is no address to put in it.
-`DNSSEC` is parked — see below.
+Still missing: `AAAA` — the server now has an address, see below. `DNSSEC` is
+parked — also below.
 
 ## CAA — done 2026-09-07
 
@@ -131,12 +131,52 @@ The policy still applies — `p=quarantine` is enforced by receivers whether or 
 anyone is listening — so this costs visibility, not protection. Don't add `rua`
 back without asking.
 
+## IPv6 — host ready 2026-09-07, record still to add
+
+kaktus.cc now has `2a01:4f9:c010:e67a::1/64` with a working default route, and
+everything on the server side already answers on it:
+
+| Checked from the host | Result |
+| --- | --- |
+| Global address and default route | `2a01:4f9:c010:e67a::1/64` via `fe80::1` |
+| Egress | ping and HTTPS out over v6 both fine |
+| nginx listener | `[::]:443` (the vhost has always had it) |
+| `ip6tables` | policy `ACCEPT`, nothing filtered |
+| `https://salasanasi.fi/` forced to the v6 address | 301 to www, certificate verifies |
+| `https://www.salasanasi.fi/` forced to the v6 address | 200, certificate verifies |
+
+So only the record is missing:
+
+```
+salasanasi.fi.	3600	IN	AAAA	2a01:4f9:c010:e67a::1
+```
+
+`www` needs nothing of its own — it is a CNAME to the apex.
+
+**Re-run the certbot dry-run immediately after adding it.** Let's Encrypt prefers
+IPv6 for the HTTP-01 challenge once an `AAAA` exists. It falls back to IPv4 if
+the v6 connection is refused outright, but a path that accepts the connection and
+then stalls — a cloud firewall dropping packets, say — will not fall back, and
+the failure surfaces at renewal rather than now:
+
+```sh
+dig +short AAAA salasanasi.fi
+ssh kaktus.cc sudo certbot renew --dry-run --cert-name salasanasi.fi
+```
+
+What is still unproven is *inbound* v6 from the public internet: the tests above
+were made from the host itself, which does not traverse Hetzner's network, and
+public reachability checkers will not take a bare IPv6 address. Publishing the
+`AAAA` and re-running SSL Labs settles it — it scans every address a name
+resolves to, so a v6 endpoint that is unreachable shows up as a failed endpoint.
+
+The proxied upstreams were checked at the same time, because a host that gains
+v6 egress starts preferring it: `haveibeenpwned.com`, `api.xposedornot.com` and
+`api.pwnedpasswords.com` all answer over v6, and `openmat.fi` has no `AAAA` at
+all, so the Matomo proxy keeps using IPv4.
+
 ## Noticed while auditing, not done
 
-- **No IPv6.** kaktus.cc has no global IPv6 address at all, so there is nothing
-  to point an `AAAA` at. The vhost already listens on `[::]:443`, so once Hetzner
-  assigns one, `AAAA` records for the apex and `www` are the whole job. Until
-  then internet.nl will fail its IPv6 half regardless of anything in this repo.
 - **HSTS preloading** is possible but not recommended here. The header would have
   to become `max-age=63072000; includeSubDomains; preload`, which forces HTTPS on
   every future subdomain of `salasanasi.fi` as well, and getting off the preload
